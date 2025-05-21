@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
+from . import querysets
 
-# Models Abstratos
+# Models Abstract
 class CreatedAtModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True,editable=False)
 
@@ -9,94 +10,139 @@ class CreatedAtModel(models.Model):
         abstract = True
 
 class TimeStampedModel(CreatedAtModel):
-    updated_at = models.DateTimeField(auto_now=True, auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         abstract = True
 
 
-# Models principais
-class TipoUsuario(models.Model):
-    descricao = models.CharField(max_length=50)
+# Models Main
+class UserType(models.Model):
+    Administrator = 'Administrator'
+    Customer = 'Customer'
+    Delivery_Man = 'Delivery Man'
+
+    User_Type_Choices = [
+        (Administrator, 'Administrador'),
+        (Customer, 'Cliente'),
+        (Delivery_Man, 'Entregador'),
+    ]
+
+    description = models.CharField(
+        max_length=50,
+        choices=User_Type_Choices
+    )
 
     def __str__(self):
-        return self.descricao
+        return self.get_description_display()
 
-class Usuario(TimeStampedModel):
-    nome_completo = models.CharField(max_length=250)
-    cpf_cnpj = models.CharField(max_length=14, unique=True)
-    data_nascimento = models.DateField()
+
+class User(TimeStampedModel):
+    full_name = models.CharField(max_length=250)
+    cpf = models.CharField(max_length=11)
+    tax_id = models.CharField(max_length=14, unique=True) 
+    birth_date = models.DateField()
     email = models.EmailField(max_length=250)
-    senha = models.CharField(max_length=50)
-    tipo_usuario = models.ForeignKey(TipoUsuario, on_delete=models.PROTECT)
-    status_usuario = models.BooleanField(default=True)
+    password = models.CharField(max_length=50)
+    user_type = models.ForeignKey(UserType, on_delete=models.PROTECT)
+    is_active = models.BooleanField(default=True)
+
+    objects = querysets.UserQuerySet.as_manager()
 
     def __str__(self):
-        return self.nome_completo
+        return self.full_name
 
-class Entregador(TimeStampedModel):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
-    disponibilidade = models.CharField(max_length=50)
-    veiculo = models.CharField(max_length=50)
-    placa = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"Entregador {self.usuario.nome_completo}"
-
-class StatusPedido(models.Model):
-    descricao = models.CharField(max_length=100)
+class DeliveryPerson(TimeStampedModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    availability = models.CharField(max_length=50)
+    vehicle = models.CharField(max_length=50)
+    license_plate = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.descricao
+        return f"Delivery Person {self.user.full_name}"
 
-class Pedido(TimeStampedModel):
-    restaurante_id = models.IntegerField()
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    entregador = models.ForeignKey(Entregador, on_delete=models.SET_NULL, null=True)
-    taxa_entrega = models.DecimalField(max_digits=10, decimal_places=2)
-    valor_pedido = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.ForeignKey(StatusPedido, on_delete=models.PROTECT)
-    data_encerramento = models.DateTimeField(null=True, blank=True)
-    origem_app = models.CharField(max_length=100)
+class OrderStatus(models.Model):
+    Waiting_Collection = 'Waiting for Collection'
+    En_Route = 'En Route'
+    Delivered = 'Delivered'
+    Cancelled = 'Cancelled'
+    In_Production = 'In Production'
 
-    def __str__(self):
-        return f"Pedido #{self.id}"
+    Order_Status_Choices = [
+        (Waiting_Collection, 'Aguardando Coleta'),
+        (En_Route, 'Em Rota'),
+        (Delivered, 'Entregue'),
+        (Cancelled,'Cancelado'),
+        (In_Production,'Em Produção')
+    ]
 
-class RastreamentoPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    latitude_inicial = models.CharField(max_length=50)
-    longitude_inicial = models.CharField(max_length=50)
-    latitude_final = models.CharField(max_length=50)
-    longitude_final = models.CharField(max_length=50)
-    status_evento = models.CharField(max_length=50)
-    data_hora = models.DateTimeField(default=timezone.now)
+    description = models.CharField(
+        max_length=50,
+        choices=Order_Status_Choices
+    )
 
     def __str__(self):
-        return f"Rastreamento {self.pedido.id} - {self.status_evento}"
+        return self.description
 
-class NotificacaoUsuario(TimeStampedModel):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    mensagem = models.TextField()
-    canal_envio = models.CharField(max_length=50)
-    data_envio = models.DateTimeField(default=timezone.now)
-    status_leitura = models.BooleanField(default=False)
+class Order(TimeStampedModel):
+    restaurant_id = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    order_value = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.ForeignKey(OrderStatus, on_delete=models.PROTECT)
+    closing_date = models.DateTimeField(null=True, blank=True)
+    app_origin = models.CharField(max_length=100)
+
+    objects = querysets.OrderQuerySet.as_manager()
 
     def __str__(self):
-        return f"Notificação para {self.usuario.nome_completo}"
+        return f"Order #{self.id}"
 
-class LogUsuario(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    acao = models.CharField(max_length=50)
-    data_hora = models.DateTimeField(default=timezone.now)
+class OrderTracking(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    start_latitude = models.CharField(max_length=50)
+    start_longitude = models.CharField(max_length=50)
+    end_latitude = models.CharField(max_length=50)
+    end_longitude = models.CharField(max_length=50)
+    event_status = models.CharField(max_length=50)
+    timestamp = models.DateTimeField(default=timezone.now)
 
-class LogAcesso(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    acao = models.CharField(max_length=50)
-    ip_origem = models.CharField(max_length=45)
-    data_hora = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f"Tracking {self.order.id} - {self.event_status}"
 
-class LogPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    acao = models.CharField(max_length=50)
-    data_hora = models.DateTimeField(default=timezone.now)
+class UserNotification(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    delivery_channel = models.CharField(max_length=50)
+    sent_at = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification for {self.user.full_name}"
+
+class UserLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=50)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Action: {self.action}"
+
+class AccessLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=50)
+    origin_ip = models.CharField(max_length=45)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Action: {self.action}"
+
+class OrderLog(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    action = models.CharField(max_length=50)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Action: {self.action}"
 
