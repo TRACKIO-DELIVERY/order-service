@@ -98,6 +98,18 @@ class Order(TimeStampedModel):
 
     def __str__(self):
         return f"Order #{self.id}"
+    
+class ComplementaryOrder(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    delivery_street = models.CharField(max_length=100)
+    delivery_neighborhood = models.CharField(max_length=100)
+    delivery_number = models.CharField(max_length=10)
+    delivery_zip_code = models.CharField(max_length=20)
+    pickup_street = models.CharField(max_length=100)
+    pickup_neighborhood = models.CharField(max_length=100)
+    pickup_number = models.CharField(max_length=10)
+    pickup_zip_code = models.CharField(max_length=10)
+
 
 class OrderTracking(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
