@@ -2,11 +2,16 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
 
-from order_service.users.api.views import UserViewSet
+#from order_service.users.api.views import UserViewSet
+from order_service.core.api.views import DeliveryPersonViewSet,OrderViewSet,OrderTrackingViewSet,UserViewSet
 
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
-router.register("users", UserViewSet)
+#router.register("users", UserViewSet)
+router.register(r'users',UserViewSet)
+router.register(r'delivery-people',DeliveryPersonViewSet)
+router.register(r'orders',OrderViewSet),
+router.register(r'tracking',OrderTrackingViewSet)
 
 
 app_name = "api"

@@ -17,35 +17,29 @@ class TimeStampedModel(CreatedAtModel):
 
 
 # Models Main
-class UserType(models.Model):
-    Administrator = 'Administrator'
-    Customer = 'Customer'
-    Delivery_Man = 'Delivery Man'
-
-    User_Type_Choices = [
-        (Administrator, 'Administrador'),
-        (Customer, 'Cliente'),
-        (Delivery_Man, 'Entregador'),
-    ]
-
-    description = models.CharField(
-        max_length=50,
-        choices=User_Type_Choices
-    )
-
-    def __str__(self):
-        return self.get_description_display()
-
 
 class User(TimeStampedModel):
     full_name = models.CharField(max_length=250)
-    cpf = models.CharField(max_length=11)
-    tax_id = models.CharField(max_length=14, unique=True) 
+    cpf = models.CharField(max_length=11, unique=True)
     birth_date = models.DateField()
     email = models.EmailField(max_length=250)
     password = models.CharField(max_length=50)
-    user_type = models.ForeignKey(UserType, on_delete=models.PROTECT)
     is_active = models.BooleanField(default=True)
+
+    ADMINISTRATOR = 'Administrator'
+    CUSTOMER = 'Customer'
+    DELIVERY_MAN = 'Delivery Man'
+
+    USER_TYPE_CHOICES = [
+        (ADMINISTRATOR, 'Administrador'),
+        (CUSTOMER, 'Cliente'),
+        (DELIVERY_MAN, 'Entregador'),
+    ]
+
+    user_type = models.CharField(
+        max_length=50,
+        choices=USER_TYPE_CHOICES
+    )
 
     objects = querysets.UserQuerySet.as_manager()
 
