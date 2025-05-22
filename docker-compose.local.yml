@@ -22,6 +22,8 @@ services:
     ports:
       - '8000:8000'
     command: /start
+    networks:
+      - rabbitmq_net
 
   postgres:
     build:
@@ -46,33 +48,36 @@ services:
     container_name: order_service_local_redis
     volumes:
       - order_service_local_redis_data:/data
+  # celeryworker:
+  #   <<: *django
+  #   image: order_service_local_celeryworker
+  #   container_name: order_service_local_celeryworker
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - mailpit
+  #   ports: []
+  #   command: /start-celeryworker
 
-  celeryworker:
-    <<: *django
-    image: order_service_local_celeryworker
-    container_name: order_service_local_celeryworker
-    depends_on:
-      - redis
-      - postgres
-      - mailpit
-    ports: []
-    command: /start-celeryworker
+  # celerybeat:
+  #   <<: *django
+  #   image: order_service_local_celerybeat
+  #   container_name: order_service_local_celerybeat
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - mailpit
+  #   ports: []
+  #   command: /start-celerybeat
 
-  celerybeat:
-    <<: *django
-    image: order_service_local_celerybeat
-    container_name: order_service_local_celerybeat
-    depends_on:
-      - redis
-      - postgres
-      - mailpit
-    ports: []
-    command: /start-celerybeat
+  # flower:
+  #   <<: *django
+  #   image: order_service_local_flower
+  #   container_name: order_service_local_flower
+  #   ports:
+  #     - '5555:5555'
+  #   command: /start-flower
 
-  flower:
-    <<: *django
-    image: order_service_local_flower
-    container_name: order_service_local_flower
-    ports:
-      - '5555:5555'
-    command: /start-flower
+networks:
+  rabbitmq_net:
+    external: true
