@@ -14,8 +14,6 @@ class UserQuerySet(QuerySet):
 class DeliveryPersonQuerySet(QuerySet):
     pass
 
-class OrderStatusQuerySet(QuerySet):
-    pass
 
 class OrderQuerySet(QuerySet):
     

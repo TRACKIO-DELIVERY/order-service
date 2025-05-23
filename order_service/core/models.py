@@ -55,7 +55,15 @@ class DeliveryPerson(TimeStampedModel):
     def __str__(self):
         return f"Delivery Person {self.user.full_name}"
 
-class OrderStatus(models.Model):
+class Order(TimeStampedModel):
+    establishment = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    order_value = models.DecimalField(max_digits=10, decimal_places=2)
+    closing_date = models.DateTimeField(null=True, blank=True)
+    app_origin = models.CharField(max_length=100)
+
     Waiting_Collection = 'Waiting for Collection'
     En_Route = 'En Route'
     Delivered = 'Delivered'
@@ -70,23 +78,11 @@ class OrderStatus(models.Model):
         (In_Production,'Em Produção')
     ]
 
-    description = models.CharField(
+    order_status = models.CharField(
         max_length=50,
         choices=Order_Status_Choices
     )
 
-    def __str__(self):
-        return self.description
-
-class Order(TimeStampedModel):
-    restaurant_id = models.IntegerField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
-    order_value = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.ForeignKey(OrderStatus, on_delete=models.PROTECT)
-    closing_date = models.DateTimeField(null=True, blank=True)
-    app_origin = models.CharField(max_length=100)
 
     objects = querysets.OrderQuerySet.as_manager()
 
@@ -96,13 +92,52 @@ class Order(TimeStampedModel):
 class ComplementaryOrder(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     delivery_street = models.CharField(max_length=100)
-    delivery_neighborhood = models.CharField(max_length=100)
+    delivery_neighborhood = models.CharField(max_length=100,blank=True)
     delivery_number = models.CharField(max_length=10)
-    delivery_zip_code = models.CharField(max_length=20)
+    delivery_city = models.CharField(max_length=100)
+    delivery_state = models.CharField(max_length=100)
+    delivery_country = models.CharField(max_length=100)
+    full_delivery_address = models.CharField(max_length=400,editable=False)
     pickup_street = models.CharField(max_length=100)
-    pickup_neighborhood = models.CharField(max_length=100)
+    pickup_neighborhood = models.CharField(max_length=100,blank=True)
     pickup_number = models.CharField(max_length=10)
-    pickup_zip_code = models.CharField(max_length=10)
+    pickup_city = models.CharField(max_length=100)
+    pickup_state = models.CharField(max_length=100)
+    pickup_country = models.CharField(max_length=100)
+    full_pickup_address = models.CharField(max_length=400,editable=False)
+
+    def save_delivery(self, *args, **kwargs):
+        # Monta o endereço completo
+        parts = [
+            self.delivery_street,
+            self.delivery_number,
+        ]
+        if self.delivery_neighborhood:
+            parts.append(self.delivery_neighborhood)
+        parts += [
+            self.delivery_city,
+            self.delivery_state,
+            self.delivery_country
+        ]
+        self.full_delivery_address = ', '.join(parts)
+        super().save(*args, **kwargs)
+
+    def save_pickup(self, *args, **kwargs):
+        # Monta o endereço completo
+        parts = [
+            self.pickup_street,
+            self.pickup_number,
+        ]
+        if self.pickup_neighborhood:
+            parts.append(self.pickup_neighborhood)
+        parts += [
+            self.pickup_city,
+            self.pickup_state,
+            self.pickup_country
+        ]
+        self.full_pickup_address = ', '.join(parts)
+        super().save(*args, **kwargs)
+    
 
 
 class OrderTracking(models.Model):
