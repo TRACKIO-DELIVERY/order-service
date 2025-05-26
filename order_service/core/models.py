@@ -1,3 +1,4 @@
+# Create your models here.
 from django.db import models
 from django.utils import timezone
 from . import querysets
@@ -157,4 +158,3 @@ class OrderLog(models.Model):
 
     def __str__(self):
         return f"Action: {self.action}"
-
