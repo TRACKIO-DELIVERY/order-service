@@ -1,16 +1,20 @@
 import pika
+from callbacks import on_close_connection
+from callbacks import on_open_connection
+
 
 class AMQPClient:
     """
     A simple AMQP client for connecting to an AMQP server.
     This client uses the pika library to establish a connection and perform basic operations.
+
     :param host: Hostname of the AMQP server (default is 'localhost').
     :param port: Port number of the AMQP server (default is 5672).
     :param username: Username for authentication (default is 'user').
     :param password: Password for authentication (default is 'password').
     """
-    
-    def __init__(self, host='localhost', port=5672, username='user', password='password'):
+
+    def __init__(self, host="localhost", port=5672, username="user", password="password"):  # noqa: S107
         self.host = host
         self.port = port
         self.username = username
@@ -24,18 +28,20 @@ class AMQPClient:
         :return: The connection object.
         """
         if self.connection:
-            print("Connection already established.")
             return self.connection
         credentials = pika.PlainCredentials(self.username, self.password)
         parameters = pika.ConnectionParameters(
-            host=self.host,
-            port=self.port,
-            credentials=credentials
+            host=self.host, port=self.port, credentials=credentials
         )
-        self.connection = pika.SelectConnection(parameters)
-        
+        self.connection = pika.SelectConnection(
+            parameters,
+            on_open_callback=on_open_connection,
+            on_close_callback=on_close_connection,
+        )
+
         self.channel = self.connection.channel()
 
+        return self.connection
 
     def get_connection(self):
         """
@@ -50,18 +56,7 @@ class AMQPClient:
         :return: The channel object.
         """
         return self.channel
-        
-    def on_close(self, connection, reason):
-        """
-        Callback function to handle connection closure.
-        :param connection: The connection object.
-        :param reason: The reason for the closure.
-        """
-        print(f"Connection closed: {reason}")
-        self.connection = None
-        self.channel = None
-        
-    
+
     def close(self):
         if self.connection:
             self.connection.close()

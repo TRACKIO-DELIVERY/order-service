@@ -60,6 +60,8 @@ extend-exclude = [
     "*/migrations/*.py",
     "staticfiles/*",
 ]
+line-length = 100
+
 
 [tool.ruff.lint]
 select = [
