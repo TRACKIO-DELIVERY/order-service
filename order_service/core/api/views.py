@@ -4,6 +4,7 @@ from core.models import Order
 from core.models import OrderTracking
 from core.models import User
 from rest_framework import viewsets
+from drf_spectacular.utils import extend_schema
 
 from .serializers import CreateComplementaryOrderSerializer
 from .serializers import DeliveryPersonCreatedSerializer
@@ -20,6 +21,7 @@ from .serializers import UpdateComplementaryOrderSerializer
 from .serializers import UserCreatedSerializer
 from .serializers import UserReadSerializer
 from .serializers import UserUpdateSerializer
+from .serializers import CreateOrderAlignedSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -221,3 +223,11 @@ class ComplementaryOrderViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return UpdateComplementaryOrderSerializer
         return ReadOnlyComplementaryOrderSerializer
+    
+class OrderAlignedViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for handling aligned order creation and management.
+    This uses a custom serializer that nests complementary order data.
+    """
+    queryset = Order.objects.all()
+    serializer_class = CreateOrderAlignedSerializer

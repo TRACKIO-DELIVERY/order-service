@@ -49,6 +49,7 @@ class UserCreatedSerializer(serializers.ModelSerializer[User]):
         model = User
         fields = ["full_name", "email", "birth_date", "is_active", "user_type", "cpf"]
 
+
     def create(self, validated_data):
         return super().create(validated_data)
 
@@ -74,7 +75,7 @@ class UserUpdateSerializer(serializers.ModelSerializer[User]):
 
     class Meta:
         model = User
-        fields = ["full_name", "email", "is_active", "user_type"]
+        fields = ["full_name", "email", "is_active", "user_type", "cpf", "birth_date"]
         read_only_fields = ["cpf", "birth_date"]
 
     def update(self, instance, validated_data):
@@ -246,6 +247,7 @@ class CreateComplementaryOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplementaryOrder
         fields = [
+            "order",
             "delivery_street",
             "delivery_neighborhood",
             "delivery_number",
@@ -259,7 +261,7 @@ class CreateComplementaryOrderSerializer(serializers.ModelSerializer):
             "pickup_state",
             "pickup_country",
         ]
-        extra_kwargs = {"order": {"read_only": True}}
+        #extra_kwargs = {"order": {"read_only": True}}
 
     def create(self, validated_data):
         return super().create(validated_data)
@@ -580,3 +582,63 @@ class OrderTrackingUpdateSerializer(serializers.ModelSerializer[OrderTracking]):
 
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
+
+
+class CreateComplementaryOrderAlignedSerializer(serializers.ModelSerializer):
+    
+    """
+    Serializer for the ComplementaryOrder model.
+    Captures delivery and pickup address details.
+    """
+    
+    class Meta:
+        model = ComplementaryOrder
+        fields = [
+            "delivery_street",
+            "delivery_neighborhood",
+            "delivery_number",
+            "delivery_city",
+            "delivery_state",
+            "delivery_country",
+            "pickup_street",
+            "pickup_neighborhood",
+            "pickup_number",
+            "pickup_city",
+            "pickup_state",
+            "pickup_country",
+        ]
+
+class CreateOrderAlignedSerializer(serializers.ModelSerializer):
+
+    """
+    Serializer for creating an Order along with its ComplementaryOrder data.
+    """
+    
+    complementary_order = CreateComplementaryOrderAlignedSerializer()
+
+    class Meta:
+        model = Order
+        fields = [
+            "establishment",
+            "user",
+            "delivery_person",
+            "delivery_fee",
+            "order_value",
+            "order_status",
+            "closing_date",
+            "app_origin",
+            "complementary_order"
+        ]
+
+    def create(self, validated_data):
+        """
+        Creates an Order instance along with its nested ComplementaryOrder data.
+        """
+
+        complementary_data = validated_data.pop('complementary_order')
+
+        order = Order.objects.create(**validated_data)
+
+        ComplementaryOrder.objects.create(order=order, **complementary_data)
+
+        return order
