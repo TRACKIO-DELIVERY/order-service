@@ -10,4 +10,4 @@ Descreva como seu Merge Request pode impactar o sistema, ex: Foi implementado um
 - []  Testes unitários
 - []  Testes manuais
 # Evidência
-Print ou vídeo 
+Print ou vídeo
