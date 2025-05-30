@@ -18,7 +18,6 @@ def create_tracking_for_order(order):
             start_longitude=str(start_lng),
             end_latitude=str(end_lat),
             end_longitude=str(end_lng),
-            event_status="", #a ser retirado
             timestamp=timezone.now()
         )
 

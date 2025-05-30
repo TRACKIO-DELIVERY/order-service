@@ -3,7 +3,12 @@ from core.models import DeliveryPerson
 from core.models import Order
 from core.models import OrderTracking
 from core.models import User
+from order_service.services import order_tracking_service
+
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 from drf_spectacular.utils import extend_schema
 
 from .serializers import CreateComplementaryOrderSerializer
@@ -231,3 +236,19 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
     """
     queryset = Order.objects.all()
     serializer_class = CreateOrderAlignedSerializer
+
+    @action(detail=True, methods=["post"], url_path="generate-tracking-coords")
+    def generate_tracking_coords(self, request, pk=None):
+        
+        """
+            Generate tracking coords
+            POST /api/orders/{id}/generate-tracking-coords
+        """
+        try:
+            order = self.get_object()
+            tracking = order_tracking_service.create_tracking_for_order(order)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = OrderTrackingReadSerializer(tracking, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
