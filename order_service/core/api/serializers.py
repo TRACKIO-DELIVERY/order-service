@@ -1,9 +1,10 @@
-from core.models import ComplementaryOrder
-from core.models import DeliveryPerson
-from core.models import Order
-from core.models import OrderTracking
-from core.models import User
 from rest_framework import serializers
+
+from order_service.core.models import ComplementaryOrder
+from order_service.core.models import DeliveryPerson
+from order_service.core.models import Order
+from order_service.core.models import OrderTracking
+from order_service.core.models import User
 
 
 class UserReadSerializer(serializers.ModelSerializer[User]):
@@ -48,7 +49,6 @@ class UserCreatedSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
         fields = ["full_name", "email", "birth_date", "is_active", "user_type", "cpf"]
-
 
     def create(self, validated_data):
         return super().create(validated_data)
@@ -261,7 +261,6 @@ class CreateComplementaryOrderSerializer(serializers.ModelSerializer):
             "pickup_state",
             "pickup_country",
         ]
-        #extra_kwargs = {"order": {"read_only": True}}
 
     def create(self, validated_data):
         return super().create(validated_data)
@@ -348,9 +347,7 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
 
     user_full_name = serializers.CharField(source="user.full_name", read_only=True)
     user_cpf = serializers.CharField(source="user.cpf", read_only=True)
-    delivery_person_full_name = serializers.CharField(
-        source="delivery_person.user.full_name", read_only=True
-    )
+    delivery_person_full_name = serializers.CharField(source="delivery_person.user.full_name", read_only=True)
 
     full_delivery_address = serializers.SerializerMethodField()
     full_pickup_address = serializers.SerializerMethodField()
@@ -523,9 +520,7 @@ class OrderTrackingReadSerializer(serializers.ModelSerializer[OrderTracking]):
             "url",
         ]
         read_only_fields = fields
-        extra_kwargs = {
-            "url": {"view_name": "api:ordertracking-detail", "lookup_field": "pk"}
-        }
+        extra_kwargs = {"url": {"view_name": "api:ordertracking-detail", "lookup_field": "pk"}}
 
 
 class OrderTrackingCreatedSerializer(serializers.ModelSerializer[OrderTracking]):
@@ -585,12 +580,11 @@ class OrderTrackingUpdateSerializer(serializers.ModelSerializer[OrderTracking]):
 
 
 class CreateComplementaryOrderAlignedSerializer(serializers.ModelSerializer):
-    
     """
     Serializer for the ComplementaryOrder model.
     Captures delivery and pickup address details.
     """
-    
+
     class Meta:
         model = ComplementaryOrder
         fields = [
@@ -608,12 +602,12 @@ class CreateComplementaryOrderAlignedSerializer(serializers.ModelSerializer):
             "pickup_country",
         ]
 
-class CreateOrderAlignedSerializer(serializers.ModelSerializer):
 
+class CreateOrderAlignedSerializer(serializers.ModelSerializer):
     """
     Serializer for creating an Order along with its ComplementaryOrder data.
     """
-    
+
     complementary_order = CreateComplementaryOrderAlignedSerializer()
 
     class Meta:
@@ -627,7 +621,7 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
             "order_status",
             "closing_date",
             "app_origin",
-            "complementary_order"
+            "complementary_order",
         ]
 
     def create(self, validated_data):
@@ -635,7 +629,7 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
         Creates an Order instance along with its nested ComplementaryOrder data.
         """
 
-        complementary_data = validated_data.pop('complementary_order')
+        complementary_data = validated_data.pop("complementary_order")
 
         order = Order.objects.create(**validated_data)
 
