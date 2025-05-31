@@ -506,10 +506,10 @@ class OrderTrackingReadSerializer(serializers.ModelSerializer[OrderTracking]):
         - All fields are read-only.
         - The "url" field uses the view name "api:ordertracking-detail" and looks up by primary key.
     """
-    start_latitude = serializers.FloatField(source="start_latitude", read_only=True)
-    start_longitude = serializers.FloatField(source="start_longitude", read_only=True)
-    end_latitude = serializers.FloatField(source="end_latitude", read_only=True)
-    end_longitude = serializers.FloatField(source="end_longitude", read_only=True)
+    start_latitude = serializers.FloatField( read_only=True)
+    start_longitude = serializers.FloatField(read_only=True)
+    end_latitude = serializers.FloatField(read_only=True)
+    end_longitude = serializers.FloatField( read_only=True)
     
     class Meta:
         model = OrderTracking

@@ -1,5 +1,5 @@
 from order_service.core.models import OrderTracking, ComplementaryOrder
-from .geocode_service import GeoocodeService
+from order_service.services.geocode_service import GeoocodeService
 from django.utils import timezone
 
 def create_tracking_for_order(order):
