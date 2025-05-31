@@ -1,15 +1,16 @@
-from core.models import ComplementaryOrder
-from core.models import DeliveryPerson
-from core.models import Order
-from core.models import OrderTracking
-from core.models import User
-from order_service.services import order_tracking_service
-
 from rest_framework import viewsets
 from django.db import transaction
-from drf_spectacular.utils import extend_schema
+
+from order_service.core.models import ComplementaryOrder
+from order_service.core.models import DeliveryPerson
+from order_service.core.models import Order
+from order_service.core.models import OrderTracking
+from order_service.core.models import User
+
+from order_service.services import order_tracking_service
 
 from .serializers import CreateComplementaryOrderSerializer
+from .serializers import CreateOrderAlignedSerializer
 from .serializers import DeliveryPersonCreatedSerializer
 from .serializers import DeliveryPersonReadSerializer
 from .serializers import DeliveryPersonUpdateSerializer
@@ -24,7 +25,6 @@ from .serializers import UpdateComplementaryOrderSerializer
 from .serializers import UserCreatedSerializer
 from .serializers import UserReadSerializer
 from .serializers import UserUpdateSerializer
-from .serializers import CreateOrderAlignedSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -149,9 +149,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         - DELETE /api/orders/{id}/      → Delete an order
     """
 
-    queryset = Order.objects.all().select_related(
-        "complementary_order", "user", "delivery_person__user"
-    )
+    queryset = Order.objects.all().select_related("complementary_order", "user", "delivery_person__user")
     serializer_class = OrderReadSerializer
 
     def get_serializer_class(self):
@@ -207,7 +205,8 @@ class ComplementaryOrderViewSet(viewsets.ModelViewSet):
     Serializer classes:
         - CreateComplementaryOrderSerializer: Used for creating a new complementary order (POST).
         - UpdateComplementaryOrderSerializer: Used for updating complementary order data (PUT/PATCH).
-        - ReadOnlyComplementaryOrderSerializer: Default serializer for retrieving complementary order information (GET).
+        - ReadOnlyComplementaryOrderSerializer: Default serializer for retrieving
+        complementary order information (GET).
 
     Example endpoints:
         - GET    /api/complementary-orders/           → List all complementary orders
@@ -238,5 +237,6 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
     ViewSet for handling aligned order creation and management.
     This uses a custom serializer that nests complementary order data.
     """
+
     queryset = Order.objects.all()
     serializer_class = CreateOrderAlignedSerializer
