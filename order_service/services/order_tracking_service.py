@@ -6,18 +6,26 @@ def create_tracking_for_order(order):
     try:
         comp_order = ComplementaryOrder.objects.get(order=order)
         
-        pickup_address = f"{comp_order.pickup_street}, {comp_order.pickup_number}, {comp_order.pickup_neighborhood}, {comp_order.pickup_zip_code}"
-        delivery_address = f"{comp_order.delivery_street}, {comp_order.delivery_number}, {comp_order.delivery_neighborhood}, {comp_order.delivery_zip_code}"
+        pickup_address = (
+            f"{comp_order.pickup_street}, {comp_order.pickup_number}, "
+            f"{comp_order.pickup_neighborhood}, {comp_order.pickup_city}, "
+            f"{comp_order.pickup_state}, {comp_order.pickup_country}"
+        )
+        delivery_address = (
+            f"{comp_order.delivery_street}, {comp_order.delivery_number}, "
+            f"{comp_order.delivery_neighborhood}, {comp_order.delivery_city}, "
+            f"{comp_order.delivery_state}, {comp_order.delivery_country}"
+        )
         
-        start_lat, start_lng = GeoocodeService.address_to_coordinates(pickup_address)
-        end_lat, end_lng = GeoocodeService.address_to_coordinates(delivery_address)
+        pickup_coords = GeoocodeService.address_to_coordinates(pickup_address)
+        delivery_coords = GeoocodeService.address_to_coordinates(delivery_address)
         
         tracking = OrderTracking.objects.create(
             order=order,
-            start_latitude=str(start_lat),
-            start_longitude=str(start_lng),
-            end_latitude=str(end_lat),
-            end_longitude=str(end_lng),
+            start_latitude=str(pickup_coords["lat"]),
+            start_longitude=str(pickup_coords["lng"]),
+            end_latitude=str(delivery_coords["lat"]),
+            end_longitude=str(delivery_coords["lng"]),
             timestamp=timezone.now()
         )
 
