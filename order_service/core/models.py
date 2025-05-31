@@ -62,9 +62,7 @@ class DeliveryPerson(TimeStampedModel):
 class Order(TimeStampedModel):
     establishment = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    delivery_person = models.ForeignKey(
-        DeliveryPerson, on_delete=models.SET_NULL, null=True
-    )
+    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
     order_value = models.DecimalField(max_digits=10, decimal_places=2)
     closing_date = models.DateTimeField(null=True, blank=True)
@@ -109,11 +107,12 @@ class ComplementaryOrder(models.Model):
     pickup_state = models.CharField(max_length=100)
     pickup_country = models.CharField(max_length=100)
 
+    def __str__(self):
+        return f"Complementary Order for {self.order.id}"
+
 
 class OrderTracking(models.Model):
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, related_name="tracking_order"
-    )
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="tracking_order")
     start_latitude = models.CharField(max_length=50)
     start_longitude = models.CharField(max_length=50)
     end_latitude = models.CharField(max_length=50)
