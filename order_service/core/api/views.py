@@ -1,10 +1,13 @@
 from rest_framework import viewsets
+from django.db import transaction
 
 from order_service.core.models import ComplementaryOrder
 from order_service.core.models import DeliveryPerson
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
 from order_service.core.models import User
+
+from order_service.services import order_tracking_service
 
 from .serializers import CreateComplementaryOrderSerializer
 from .serializers import CreateOrderAlignedSerializer
@@ -222,8 +225,13 @@ class ComplementaryOrderViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return UpdateComplementaryOrderSerializer
         return ReadOnlyComplementaryOrderSerializer
+    
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            complemantary_order = serializer.save()
+            order_tracking_service.create_tracking_for_order(complemantary_order.order)
 
-
+    
 class OrderAlignedViewSet(viewsets.ModelViewSet):
     """
     ViewSet for handling aligned order creation and management.
