@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 
@@ -33,9 +32,3 @@ async def producer(routing_key_name: str, payload: str | dict) -> None:
             await exchange.publish(message, routing_key=routing_key)
         except aio_pika.exceptions.NackError:
             logging.exception(" [!] Failed to publish message")
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete()
-    loop.close()

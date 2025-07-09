@@ -10,12 +10,10 @@ from .models import Order
 @receiver(post_save, sender=Order)
 async def send_message_to_broker(sender, instance, created, **kwargs):
     try:
-        additional = "AV independencia"
         if created:
             payload = {
                 "order_id": instance.id,
                 "status": instance.order_status,
-                "street": additional,
             }
 
             await producer(routing_key_name="order.created", payload=payload)
