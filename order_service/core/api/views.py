@@ -6,6 +6,7 @@ from order_service.core.models import DeliveryPerson
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
 from order_service.core.models import User
+from order_service.core.models import Establishment
 
 from order_service.services import order_tracking_service
 
@@ -25,7 +26,9 @@ from .serializers import UpdateComplementaryOrderSerializer
 from .serializers import UserCreatedSerializer
 from .serializers import UserReadSerializer
 from .serializers import UserUpdateSerializer
-
+from .serializers import CreatedEstablishmentSerializer
+from .serializers import ReadEstablishmentSerializer
+from .serializers import UpdateEstablishmentSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -240,3 +243,14 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
 
     queryset = Order.objects.all()
     serializer_class = CreateOrderAlignedSerializer
+
+class EstablishmentViewSet(viewsets.ModelViewSet):
+    serializer_class = ReadEstablishmentSerializer
+    queryset = Establishment.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreatedEstablishmentSerializer
+        if self.action in ["update", "partial_update"]:
+            return UpdateEstablishmentSerializer
+        return ReadEstablishmentSerializer
