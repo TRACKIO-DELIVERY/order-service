@@ -28,6 +28,7 @@ class UserType(models.IntegerChoices):
     ADMINISTRATOR = 1,"Administrator"
     CUSTOMER = 2,"Customer"
     DELIVERY_MAN = 3,"Delivery Man"
+    System = 4,"System" # Validar se seria Interesssante
 
 
 
@@ -63,7 +64,7 @@ class Address(models.Model):
 
     street = models.CharField(max_length=100)    
     neighborhood = models.CharField(max_length=100)
-    number = models.CharField(max_length=10)
+    number = models.CharField(max_length=10,blank=True)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
@@ -86,7 +87,7 @@ class OrderStatus(models.IntegerChoices):
 
 class Order(TimeStampedModel):
     establishment = models.ForeignKey(Establishment,on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    email = models.CharField(max_length=100)
     delivery_person = models.ForeignKey(
         DeliveryPerson, on_delete=models.SET_NULL, null=True
     )

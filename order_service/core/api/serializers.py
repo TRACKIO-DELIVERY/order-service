@@ -305,8 +305,6 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
         - The "url" field uses the view name "api:order-detail" and looks up by primary key.
     """
 
-    user_full_name = serializers.CharField(source="user.full_name", read_only=True)
-    user_cpf = serializers.CharField(source="user.cpf", read_only=True)
     delivery_person_full_name = serializers.CharField(
         source="delivery_person.user.full_name", read_only=True
     )
@@ -321,8 +319,7 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
             "id",
             "url",
             "establishment",
-            "user_full_name",
-            "user_cpf",
+            "email",
             "delivery_person_full_name",
             "full_delivery_address",
             "full_pickup_address",
@@ -392,7 +389,7 @@ class OrderCreatedSerializer(serializers.ModelSerializer[Order]):
         model = Order
         fields = [
             "establishment",
-            "user",
+            "email",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -427,7 +424,7 @@ class OrderUpdateSerializer(serializers.ModelSerializer[Order]):
         model = Order
         fields = [
             "establishment",
-            "user",
+            "email",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -567,7 +564,7 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             "establishment",
-            "user",
+            "email",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -598,9 +595,13 @@ class ReadAddressSerializer(serializers.ModelSerializer[Address]):
         read_only_fields = fields
 
 class CreatedAddressSerializer(serializers.ModelSerializer[Address]):
+
+    neighborhood = serializers.CharField(required = False)
+    number = serializers.CharField(required = False)
     class Meta:
         model = Address
         fields = ["street","neighborhood","number","city","state","country"]
+        
 
 class UpdateAddressSerializer(serializers.ModelSerializer[Address]):
     class Meta:

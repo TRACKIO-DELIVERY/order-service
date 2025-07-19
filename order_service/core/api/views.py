@@ -152,7 +152,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         - DELETE /api/orders/{id}/      → Delete an order
     """
 
-    queryset = Order.objects.all().select_related("complementary_order", "user", "delivery_person__user")
+    queryset = Order.objects.all().select_related("complementary_order", "delivery_person__user")
     serializer_class = OrderReadSerializer
 
     def get_serializer_class(self):
