@@ -1,15 +1,19 @@
-from order_service.core.models import OrderTracking, ComplementaryOrder
+from order_service.core.models import OrderTracking, ComplementaryOrder,Establishment,Address
 from order_service.services.geocode_service import GeoocodeService
 from django.utils import timezone
 
 def create_tracking_for_order(order):
-    try:
+        print(order)
         comp_order = ComplementaryOrder.objects.get(order=order)
+        address = order.establishment.address
+
+        print(address)
+        print(comp_order)
         
         pickup_address = (
-            f"{comp_order.pickup_street}, {comp_order.pickup_number}, "
-            f"{comp_order.pickup_neighborhood}, {comp_order.pickup_city}, "
-            f"{comp_order.pickup_state}, {comp_order.pickup_country}"
+            f"{address.street}, {address.number}, "
+            f"{address.neighborhood}, {address.city}, "
+            f"{address.state}, {address.country}"
         )
         delivery_address = (
             f"{comp_order.delivery_street}, {comp_order.delivery_number}, "
@@ -30,6 +34,3 @@ def create_tracking_for_order(order):
         )
 
         return tracking
-
-    except ComplementaryOrder.DoesNotExist:
-        raise Exception("Complementary order not found.")
