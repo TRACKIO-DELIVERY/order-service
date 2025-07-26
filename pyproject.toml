@@ -60,8 +60,7 @@ extend-exclude = [
     "*/migrations/*.py",
     "staticfiles/*",
 ]
-line-length = 100
-
+line-length=120
 
 [tool.ruff.lint]
 select = [
@@ -131,6 +130,10 @@ ignore = [
   "COM812",
   "G004",
   "TRY401",
+  "TRY002",
+  "TRY003",
+  "TRY300",
+  "EM101",
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.
