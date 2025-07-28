@@ -1,5 +1,6 @@
 # Create your models here.
 from django.db import models
+from django.db.models import JSONField
 from django.utils import timezone
 
 from . import querysets
@@ -146,6 +147,7 @@ class UserNotification(TimeStampedModel):
 class UserLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.CharField(max_length=50)
+    msg = models.JSONField(null = True, blank= True)
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -164,7 +166,8 @@ class AccessLog(models.Model):
 
 class OrderLog(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    action = models.CharField(max_length=50)
+    action = models.CharField(10)
+    msg = models.JSONField(null=True, blank=True)
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
