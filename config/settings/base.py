@@ -227,6 +227,11 @@ EMAIL_BACKEND = env(
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
 EMAIL_TIMEOUT = 5
 
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 465
+
+
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL.
@@ -344,7 +349,7 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Order Service API",
     "DESCRIPTION": "Documentation of API endpoints of Order Service",
     "VERSION": "1.0.0",
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
     "SCHEMA_PATH_PREFIX": "/api/",
 }
 # Your stuff...
