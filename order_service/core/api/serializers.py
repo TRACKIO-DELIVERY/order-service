@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
+from order_service.core.models import Address
 from order_service.core.models import ComplementaryOrder
 from order_service.core.models import DeliveryPerson
+from order_service.core.models import Establishment
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
 from order_service.core.models import User
@@ -176,7 +178,6 @@ class ReadOnlyComplementaryOrderSerializer(serializers.ModelSerializer):
     """
 
     full_delivery_address = serializers.SerializerMethodField()
-    full_pickup_address = serializers.SerializerMethodField()
 
     class Meta:
         model = ComplementaryOrder
@@ -189,13 +190,6 @@ class ReadOnlyComplementaryOrderSerializer(serializers.ModelSerializer):
             "delivery_state",
             "delivery_country",
             "full_delivery_address",
-            "pickup_street",
-            "pickup_neighborhood",
-            "pickup_number",
-            "pickup_city",
-            "pickup_state",
-            "pickup_country",
-            "full_pickup_address",
         ]
         read_only_fields = fields
 
@@ -207,16 +201,6 @@ class ReadOnlyComplementaryOrderSerializer(serializers.ModelSerializer):
         if obj.delivery_neighborhood:
             parts.append(obj.delivery_neighborhood)
         parts.extend([obj.delivery_city, obj.delivery_state, obj.delivery_country])
-        return ", ".join(filter(None, parts))
-
-    def get_full_pickup_address(self, obj):
-        parts = [
-            obj.pickup_street,
-            obj.pickup_number,
-        ]
-        if obj.pickup_neighborhood:
-            parts.append(obj.pickup_neighborhood)
-        parts.extend([obj.pickup_city, obj.pickup_state, obj.pickup_country])
         return ", ".join(filter(None, parts))
 
 
@@ -233,12 +217,6 @@ class CreateComplementaryOrderSerializer(serializers.ModelSerializer):
         - delivery_city (str): City of the delivery address.
         - delivery_state (str): State of the delivery address.
         - delivery_country (str): Country of the delivery address.
-        - pickup_street (str): Street address for pickup.
-        - pickup_neighborhood (str): Neighborhood for pickup.
-        - pickup_number (str): Number of the pickup location.
-        - pickup_city (str): City of the pickup address.
-        - pickup_state (str): State of the pickup address.
-        - pickup_country (str): Country of the pickup address.
 
     Notes:
         - The related "order" field is read-only and must be set through other means (e.g., view logic).
@@ -254,12 +232,6 @@ class CreateComplementaryOrderSerializer(serializers.ModelSerializer):
             "delivery_city",
             "delivery_state",
             "delivery_country",
-            "pickup_street",
-            "pickup_neighborhood",
-            "pickup_number",
-            "pickup_city",
-            "pickup_state",
-            "pickup_country",
         ]
 
     def create(self, validated_data):
@@ -280,12 +252,6 @@ class UpdateComplementaryOrderSerializer(serializers.ModelSerializer):
         - delivery_city (str): City of the delivery address.
         - delivery_state (str): State of the delivery address.
         - delivery_country (str): Country of the delivery address.
-        - pickup_street (str): Street address for pickup.
-        - pickup_neighborhood (str): Neighborhood for pickup.
-        - pickup_number (str): Number of the pickup location.
-        - pickup_city (str): City of the pickup address.
-        - pickup_state (str): State of the pickup address.
-        - pickup_country (str): Country of the pickup address.
 
     Notes:
         - The related "order" field is read-only and cannot be modified through this serializer.
@@ -300,12 +266,6 @@ class UpdateComplementaryOrderSerializer(serializers.ModelSerializer):
             "delivery_city",
             "delivery_state",
             "delivery_country",
-            "pickup_street",
-            "pickup_neighborhood",
-            "pickup_number",
-            "pickup_city",
-            "pickup_state",
-            "pickup_country",
         ]
         extra_kwargs = {"order": {"read_only": True}}
 
@@ -345,9 +305,8 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
         - The "url" field uses the view name "api:order-detail" and looks up by primary key.
     """
 
-    user_full_name = serializers.CharField(source="user.full_name", read_only=True)
-    user_cpf = serializers.CharField(source="user.cpf", read_only=True)
     delivery_person_full_name = serializers.CharField(source="delivery_person.user.full_name", read_only=True)
+    establishment = serializers.CharField(source="establishment.name", read_only=True)
 
     full_delivery_address = serializers.SerializerMethodField()
     full_pickup_address = serializers.SerializerMethodField()
@@ -358,8 +317,7 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
             "id",
             "url",
             "establishment",
-            "user_full_name",
-            "user_cpf",
+            "email",
             "delivery_person_full_name",
             "full_delivery_address",
             "full_pickup_address",
@@ -379,9 +337,8 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
             comp_order = obj.complementary_order
             parts = [
                 comp_order.delivery_street,
+                comp_order.delivery_number,
             ]
-            if comp_order.delivery_number:
-                parts.append(comp_order.delivery_number)
             if comp_order.delivery_neighborhood:
                 parts.append(comp_order.delivery_neighborhood)
             parts.extend(
@@ -395,24 +352,17 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
         return None
 
     def get_full_pickup_address(self, obj: Order):
-        if hasattr(obj, "complementary_order") and obj.complementary_order:
-            comp_order = obj.complementary_order
-            parts = [
-                comp_order.pickup_street,
-            ]
-            if comp_order.pickup_number:
-                parts.append(comp_order.pickup_number)
-            if comp_order.pickup_neighborhood:
-                parts.append(comp_order.pickup_neighborhood)
-            parts.extend(
-                [
-                    comp_order.pickup_city,
-                    comp_order.pickup_state,
-                    comp_order.pickup_country,
-                ]
-            )
-            return ", ".join(filter(None, parts))
-        return None
+        address = obj.establishment.address
+        if not address:
+            return None
+        parts = [
+            address.street,
+            address.number,
+        ]
+        if address.neighborhood:
+            parts.append(address.neighborhood)
+        parts.extend([address.city, address.state, address.country])
+        return ", ".join(filter(None, parts))
 
 
 class OrderCreatedSerializer(serializers.ModelSerializer[Order]):
@@ -437,7 +387,7 @@ class OrderCreatedSerializer(serializers.ModelSerializer[Order]):
         model = Order
         fields = [
             "establishment",
-            "user",
+            "email",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -472,7 +422,7 @@ class OrderUpdateSerializer(serializers.ModelSerializer[Order]):
         model = Order
         fields = [
             "establishment",
-            "user",
+            "email",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -599,12 +549,6 @@ class CreateComplementaryOrderAlignedSerializer(serializers.ModelSerializer):
             "delivery_city",
             "delivery_state",
             "delivery_country",
-            "pickup_street",
-            "pickup_neighborhood",
-            "pickup_number",
-            "pickup_city",
-            "pickup_state",
-            "pickup_country",
         ]
 
 
@@ -619,7 +563,7 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             "establishment",
-            "user",
+            "email",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -641,3 +585,63 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
         ComplementaryOrder.objects.create(order=order, **complementary_data)
 
         return order
+
+
+class ReadAddressSerializer(serializers.ModelSerializer[Address]):
+    class Meta:
+        model = Address
+        fields = ["street", "neighborhood", "number", "city", "state", "country"]
+        read_only_fields = fields
+
+
+class CreatedAddressSerializer(serializers.ModelSerializer[Address]):
+    neighborhood = serializers.CharField(required=False)
+    number = serializers.CharField(required=False)
+
+    class Meta:
+        model = Address
+        fields = ["street", "neighborhood", "number", "city", "state", "country"]
+
+
+class UpdateAddressSerializer(serializers.ModelSerializer[Address]):
+    class Meta:
+        model = Address
+        fields = ["street", "neighborhood", "number", "city", "state", "country"]
+
+
+class ReadEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
+    address = ReadAddressSerializer()
+
+    class Meta:
+        model = Establishment
+        fields = ["name", "cnpj", "email", "password", "active", "address"]
+        read_only_fields = fields
+        extra_kwargs = {
+            "url": {"view_name": "api:establishment-detail", "lookup_field": "pk"},
+        }
+
+
+class CreatedEstablishmentSerializer(serializers.ModelSerializer):
+    address = CreatedAddressSerializer()
+
+    class Meta:
+        model = Establishment
+        fields = ["name", "cnpj", "email", "password", "active", "address"]
+
+    def create(self, validated_data):
+        address_data = validated_data.pop("address")
+
+        address_serializer = CreatedAddressSerializer(data=address_data)
+        address_serializer.is_valid(raise_exception=True)
+        address = address_serializer.save()
+
+        return Establishment.objects.create(address=address, **validated_data)
+
+
+class UpdateEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
+    class Meta:
+        fields = ["name", "email", "password", "active", "address"]
+        read_only_fields = ["cnpj"]
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)

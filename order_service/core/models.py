@@ -8,6 +8,7 @@ from . import querysets
 # Models Abstract
 class CreatedAtModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_user = models.CharField(max_length=100, default="Admin")
 
     class Meta:
         abstract = True
@@ -15,12 +16,20 @@ class CreatedAtModel(models.Model):
 
 class TimeStampedModel(CreatedAtModel):
     updated_at = models.DateTimeField(auto_now=True)
+    updated_user = models.CharField(max_length=100, default="Admin")
 
     class Meta:
         abstract = True
 
 
 # Models Main
+
+
+class UserType(models.IntegerChoices):
+    ADMINISTRATOR = 1, "Administrator"
+    CUSTOMER = 2, "Customer"
+    DELIVERY_MAN = 3, "Delivery Man"
+    System = 4, "System"  # Validar se seria Interesssante
 
 
 class User(TimeStampedModel):
@@ -31,17 +40,7 @@ class User(TimeStampedModel):
     password = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
 
-    ADMINISTRATOR = "Administrator"
-    CUSTOMER = "Customer"
-    DELIVERY_MAN = "Delivery Man"
-
-    USER_TYPE_CHOICES = [
-        (ADMINISTRATOR, "Administrador"),
-        (CUSTOMER, "Cliente"),
-        (DELIVERY_MAN, "Entregador"),
-    ]
-
-    user_type = models.CharField(max_length=50, choices=USER_TYPE_CHOICES)
+    user_type = models.IntegerField(choices=UserType)
 
     objects = querysets.UserQuerySet.as_manager()
 
@@ -59,30 +58,48 @@ class DeliveryPerson(TimeStampedModel):
         return f"Delivery Person {self.user.full_name}"
 
 
+class Address(models.Model):
+    street = models.CharField(max_length=100)
+    neighborhood = models.CharField(max_length=100)
+    number = models.CharField(max_length=10, blank=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.street}, {self.number}, {self.neighborhood}, {self.city}, {self.state}, {self.country}"
+
+
+class Establishment(TimeStampedModel):
+    name = models.CharField(max_length=100)
+    cnpj = models.CharField(max_length=100)
+    email = models.EmailField()
+    password = models.CharField(max_length=20)
+    active = models.BooleanField()
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.name}, {self.cnpj}"
+
+
+class OrderStatus(models.IntegerChoices):
+    WAITING_COLLECTION = 1, "Aguardando Coleta"
+    EN_ROUTE = 2, "Em Rota"
+    DELIVERED = 3, "Entregue"
+    CANCELLED = 4, "Cancelado"
+    IN_PRODUCTION = 5, "Em Produção"
+
+
 class Order(TimeStampedModel):
-    establishment = models.CharField(max_length=100)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    establishment = models.ForeignKey(Establishment, on_delete=models.CASCADE)
+    email = models.CharField(max_length=100)
     delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
     order_value = models.DecimalField(max_digits=10, decimal_places=2)
     closing_date = models.DateTimeField(null=True, blank=True)
     app_origin = models.CharField(max_length=100)
 
-    Waiting_Collection = "Waiting for Collection"
-    En_Route = "En Route"
-    Delivered = "Delivered"
-    Cancelled = "Cancelled"
-    In_Production = "In Production"
-
-    Order_Status_Choices = [
-        (Waiting_Collection, "Aguardando Coleta"),
-        (En_Route, "Em Rota"),
-        (Delivered, "Entregue"),
-        (Cancelled, "Cancelado"),
-        (In_Production, "Em Produção"),
-    ]
-
-    order_status = models.CharField(max_length=50, choices=Order_Status_Choices)
+    order_status = models.IntegerField(choices=OrderStatus)
 
     objects = querysets.OrderQuerySet.as_manager()
 
@@ -91,21 +108,13 @@ class Order(TimeStampedModel):
 
 
 class ComplementaryOrder(models.Model):
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, related_name="complementary_order"
-    )
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="complementary_order")
     delivery_street = models.CharField(max_length=100)
     delivery_neighborhood = models.CharField(max_length=100, blank=True)
     delivery_number = models.CharField(max_length=10)
     delivery_city = models.CharField(max_length=100)
     delivery_state = models.CharField(max_length=100)
     delivery_country = models.CharField(max_length=100)
-    pickup_street = models.CharField(max_length=100)
-    pickup_neighborhood = models.CharField(max_length=100, blank=True)
-    pickup_number = models.CharField(max_length=10)
-    pickup_city = models.CharField(max_length=100)
-    pickup_state = models.CharField(max_length=100)
-    pickup_country = models.CharField(max_length=100)
 
     def __str__(self):
         return f"Complementary Order for {self.order.id}"

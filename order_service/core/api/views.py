@@ -3,12 +3,14 @@ from rest_framework import viewsets
 
 from order_service.core.models import ComplementaryOrder
 from order_service.core.models import DeliveryPerson
+from order_service.core.models import Establishment
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
 from order_service.core.models import User
 from order_service.services import order_tracking_service
 
 from .serializers import CreateComplementaryOrderSerializer
+from .serializers import CreatedEstablishmentSerializer
 from .serializers import CreateOrderAlignedSerializer
 from .serializers import DeliveryPersonCreatedSerializer
 from .serializers import DeliveryPersonReadSerializer
@@ -19,8 +21,10 @@ from .serializers import OrderTrackingCreatedSerializer
 from .serializers import OrderTrackingReadSerializer
 from .serializers import OrderTrackingUpdateSerializer
 from .serializers import OrderUpdateSerializer
+from .serializers import ReadEstablishmentSerializer
 from .serializers import ReadOnlyComplementaryOrderSerializer
 from .serializers import UpdateComplementaryOrderSerializer
+from .serializers import UpdateEstablishmentSerializer
 from .serializers import UserCreatedSerializer
 from .serializers import UserReadSerializer
 from .serializers import UserUpdateSerializer
@@ -148,7 +152,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         - DELETE /api/orders/{id}/      → Delete an order
     """
 
-    queryset = Order.objects.all().select_related("complementary_order", "user", "delivery_person__user")
+    queryset = Order.objects.all().select_related("complementary_order", "delivery_person__user")
     serializer_class = OrderReadSerializer
 
     def get_serializer_class(self):
@@ -239,3 +243,15 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
 
     queryset = Order.objects.all()
     serializer_class = CreateOrderAlignedSerializer
+
+
+class EstablishmentViewSet(viewsets.ModelViewSet):
+    serializer_class = ReadEstablishmentSerializer
+    queryset = Establishment.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreatedEstablishmentSerializer
+        if self.action in ["update", "partial_update"]:
+            return UpdateEstablishmentSerializer
+        return ReadEstablishmentSerializer

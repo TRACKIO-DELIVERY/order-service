@@ -4,6 +4,7 @@ from rest_framework.routers import SimpleRouter
 
 from order_service.core.api.views import ComplementaryOrderViewSet
 from order_service.core.api.views import DeliveryPersonViewSet
+from order_service.core.api.views import EstablishmentViewSet
 from order_service.core.api.views import OrderAlignedViewSet
 from order_service.core.api.views import OrderTrackingViewSet
 from order_service.core.api.views import OrderViewSet
@@ -17,6 +18,7 @@ router.register(r"orders", OrderViewSet)
 router.register(r"tracking", OrderTrackingViewSet)
 router.register(r"complementary-order", ComplementaryOrderViewSet)
 router.register(r"aligned-order", OrderAlignedViewSet, basename="aligned-order")
+router.register(r"establishment", EstablishmentViewSet)
 
 
 app_name = "api"
