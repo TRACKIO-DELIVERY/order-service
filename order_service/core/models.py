@@ -9,7 +9,7 @@ from . import querysets
 # Models Abstract
 class CreatedAtModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    created_user = models.CharField(max_length=100,default='Admin')
+    created_user = models.CharField(max_length=100, default="Admin")
 
     class Meta:
         abstract = True
@@ -17,7 +17,7 @@ class CreatedAtModel(models.Model):
 
 class TimeStampedModel(CreatedAtModel):
     updated_at = models.DateTimeField(auto_now=True)
-    updated_user = models.CharField(max_length=100,default='Admin')
+    updated_user = models.CharField(max_length=100, default="Admin")
 
     class Meta:
         abstract = True
@@ -25,12 +25,12 @@ class TimeStampedModel(CreatedAtModel):
 
 # Models Main
 
-class UserType(models.IntegerChoices):
-    ADMINISTRATOR = 1,"Administrator"
-    CUSTOMER = 2,"Customer"
-    DELIVERY_MAN = 3,"Delivery Man"
-    System = 4,"System" # Validar se seria Interesssante
 
+class UserType(models.IntegerChoices):
+    ADMINISTRATOR = 1, "Administrator"
+    CUSTOMER = 2, "Customer"
+    DELIVERY_MAN = 3, "Delivery Man"
+    System = 4, "System"  # Validar se seria Interesssante
 
 
 class User(TimeStampedModel):
@@ -41,9 +41,7 @@ class User(TimeStampedModel):
     password = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
 
-    user_type = models.IntegerField(
-        choices=UserType.choices
-    )
+    user_type = models.IntegerField(choices=UserType)
 
     objects = querysets.UserQuerySet.as_manager()
 
@@ -59,16 +57,19 @@ class DeliveryPerson(TimeStampedModel):
 
     def __str__(self):
         return f"Delivery Person {self.user.full_name}"
-    
+
 
 class Address(models.Model):
-
-    street = models.CharField(max_length=100)    
+    street = models.CharField(max_length=100)
     neighborhood = models.CharField(max_length=100)
-    number = models.CharField(max_length=10,blank=True)
+    number = models.CharField(max_length=10, blank=True)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.street}, {self.number}, {self.neighborhood}, {self.city}, {self.state}, {self.country}"
+
 
 class Establishment(TimeStampedModel):
     name = models.CharField(max_length=100)
@@ -76,7 +77,11 @@ class Establishment(TimeStampedModel):
     email = models.EmailField()
     password = models.CharField(max_length=20)
     active = models.BooleanField()
-    address = models.ForeignKey(Address,on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.name}, {self.cnpj}"
+
 
 class OrderStatus(models.IntegerChoices):
     WAITING_COLLECTION = 1, "Aguardando Coleta"
@@ -87,19 +92,15 @@ class OrderStatus(models.IntegerChoices):
 
 
 class Order(TimeStampedModel):
-    establishment = models.ForeignKey(Establishment,on_delete=models.CASCADE)
+    establishment = models.ForeignKey(Establishment, on_delete=models.CASCADE)
     email = models.CharField(max_length=100)
-    delivery_person = models.ForeignKey(
-        DeliveryPerson, on_delete=models.SET_NULL, null=True
-    )
+    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
     order_value = models.DecimalField(max_digits=10, decimal_places=2)
     closing_date = models.DateTimeField(null=True, blank=True)
     app_origin = models.CharField(max_length=100)
 
-    order_status = models.IntegerField(
-        choices=OrderStatus.choices
-    )
+    order_status = models.IntegerField(choices=OrderStatus)
 
     objects = querysets.OrderQuerySet.as_manager()
 
@@ -108,9 +109,7 @@ class Order(TimeStampedModel):
 
 
 class ComplementaryOrder(models.Model):
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, related_name="complementary_order"
-    )
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="complementary_order")
     delivery_street = models.CharField(max_length=100)
     delivery_neighborhood = models.CharField(max_length=100, blank=True)
     delivery_number = models.CharField(max_length=10)
@@ -118,11 +117,12 @@ class ComplementaryOrder(models.Model):
     delivery_state = models.CharField(max_length=100)
     delivery_country = models.CharField(max_length=100)
 
+    def __str__(self):
+        return f"Complementary Order for {self.order.id}"
+
 
 class OrderTracking(models.Model):
-    order = models.OneToOneField(
-        Order, on_delete=models.CASCADE, related_name="tracking_order"
-    )
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="tracking_order")
     start_latitude = models.CharField(max_length=50)
     start_longitude = models.CharField(max_length=50)
     end_latitude = models.CharField(max_length=50)
