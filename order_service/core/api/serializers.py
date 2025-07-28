@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
+from order_service.core.models import Address
 from order_service.core.models import ComplementaryOrder
 from order_service.core.models import DeliveryPerson
+from order_service.core.models import Establishment
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
 from order_service.core.models import User
-from order_service.core.models import Establishment
-from order_service.core.models import Address
 
 
 class UserReadSerializer(serializers.ModelSerializer[User]):
@@ -189,7 +189,7 @@ class ReadOnlyComplementaryOrderSerializer(serializers.ModelSerializer):
             "delivery_city",
             "delivery_state",
             "delivery_country",
-            "full_delivery_address"
+            "full_delivery_address",
         ]
         read_only_fields = fields
 
@@ -231,7 +231,7 @@ class CreateComplementaryOrderSerializer(serializers.ModelSerializer):
             "delivery_number",
             "delivery_city",
             "delivery_state",
-            "delivery_country"
+            "delivery_country",
         ]
 
     def create(self, validated_data):
@@ -265,7 +265,7 @@ class UpdateComplementaryOrderSerializer(serializers.ModelSerializer):
             "delivery_number",
             "delivery_city",
             "delivery_state",
-            "delivery_country"
+            "delivery_country",
         ]
         extra_kwargs = {"order": {"read_only": True}}
 
@@ -305,11 +305,9 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
         - The "url" field uses the view name "api:order-detail" and looks up by primary key.
     """
 
-    delivery_person_full_name = serializers.CharField(
-        source="delivery_person.user.full_name", read_only=True
-    )
+    delivery_person_full_name = serializers.CharField(source="delivery_person.user.full_name", read_only=True)
     establishment = serializers.CharField(source="establishment.name", read_only=True)
-    
+
     full_delivery_address = serializers.SerializerMethodField()
     full_pickup_address = serializers.SerializerMethodField()
 
@@ -458,11 +456,12 @@ class OrderTrackingReadSerializer(serializers.ModelSerializer[OrderTracking]):
         - All fields are read-only.
         - The "url" field uses the view name "api:ordertracking-detail" and looks up by primary key.
     """
-    start_latitude = serializers.FloatField( read_only=True)
+
+    start_latitude = serializers.FloatField(read_only=True)
     start_longitude = serializers.FloatField(read_only=True)
     end_latitude = serializers.FloatField(read_only=True)
-    end_longitude = serializers.FloatField( read_only=True)
-    
+    end_longitude = serializers.FloatField(read_only=True)
+
     class Meta:
         model = OrderTracking
         fields = [
@@ -549,7 +548,7 @@ class CreateComplementaryOrderAlignedSerializer(serializers.ModelSerializer):
             "delivery_number",
             "delivery_city",
             "delivery_state",
-            "delivery_country"
+            "delivery_country",
         ]
 
 
@@ -591,34 +590,37 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
 class ReadAddressSerializer(serializers.ModelSerializer[Address]):
     class Meta:
         model = Address
-        fields = ["street","neighborhood","number","city","state","country"]
+        fields = ["street", "neighborhood", "number", "city", "state", "country"]
         read_only_fields = fields
 
-class CreatedAddressSerializer(serializers.ModelSerializer[Address]):
 
-    neighborhood = serializers.CharField(required = False)
-    number = serializers.CharField(required = False)
+class CreatedAddressSerializer(serializers.ModelSerializer[Address]):
+    neighborhood = serializers.CharField(required=False)
+    number = serializers.CharField(required=False)
+
     class Meta:
         model = Address
-        fields = ["street","neighborhood","number","city","state","country"]
-        
+        fields = ["street", "neighborhood", "number", "city", "state", "country"]
+
 
 class UpdateAddressSerializer(serializers.ModelSerializer[Address]):
     class Meta:
         model = Address
-        fields = ["street","neighborhood","number","city","state","country"]
+        fields = ["street", "neighborhood", "number", "city", "state", "country"]
+
 
 class ReadEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
-    
     address = ReadAddressSerializer()
 
     class Meta:
         model = Establishment
-        fields = ["name","cnpj","email","password","active","address"]
+        fields = ["name", "cnpj", "email", "password", "active", "address"]
         read_only_fields = fields
         extra_kwargs = {
             "url": {"view_name": "api:establishment-detail", "lookup_field": "pk"},
         }
+
+
 class CreatedEstablishmentSerializer(serializers.ModelSerializer):
     address = CreatedAddressSerializer()
 
@@ -628,19 +630,18 @@ class CreatedEstablishmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         address_data = validated_data.pop("address")
-        
+
         address_serializer = CreatedAddressSerializer(data=address_data)
         address_serializer.is_valid(raise_exception=True)
         address = address_serializer.save()
-        
-        establishment = Establishment.objects.create(address=address, **validated_data)
-        
-        return establishment
+
+        return Establishment.objects.create(address=address, **validated_data)
+
 
 class UpdateEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
     class Meta:
-        fields = ["name","email","password","active","address"]
-        read_only_fields = ['cnpj']
+        fields = ["name", "email", "password", "active", "address"]
+        read_only_fields = ["cnpj"]
 
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)

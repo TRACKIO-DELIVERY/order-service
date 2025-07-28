@@ -19,9 +19,14 @@ services:
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
+      - ./.envs/.production/.rabbitmq
+      - ./.envs/.production/.google
     ports:
       - '8000:8000'
     command: /start
+    networks:
+      - default
+      - rabbitmq_net
 
   postgres:
     build:
@@ -71,10 +76,19 @@ services:
     ports: []
     command: /start-celerybeat
 
-  flower:
-    <<: *django
-    image: order_service_local_flower
-    container_name: order_service_local_flower
-    ports:
-      - '5555:5555'
-    command: /start-flower
+# flower:
+#   <<: *django
+#   image: order_service_local_flower
+#   container_name: order_service_local_flower
+#   ports:
+#     - '5555:5555'
+#   command: /start-flower
+
+networks:
+  default:
+    name: order_service_local_network
+    driver: bridge
+
+  rabbitmq_net:
+    driver: bridge
+    external: true
