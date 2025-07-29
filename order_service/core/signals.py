@@ -4,7 +4,8 @@ from django.db import connection
 from django.db.models.signals import post_migrate
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from messaging.producer import producer
+
+from order_service.messaging.producer import producer
 
 from .models import Order
 
