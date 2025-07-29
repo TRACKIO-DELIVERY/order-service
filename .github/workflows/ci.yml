@@ -57,6 +57,9 @@ jobs:
             postgres.cache-from=type=gha,scope=postgres-cached-tests
             postgres.cache-to=type=gha,scope=postgres-cached-tests,mode=max
 
+      - name: Create Docker Network
+        run: docker network create --driver bridge rabbitmq_net || true
+
       - name: Build and cache docs
         uses: docker/bake-action@v6
         with:
