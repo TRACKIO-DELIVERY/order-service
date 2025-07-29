@@ -68,8 +68,8 @@ services:
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
-      - ./.envs/.local/.google
-      - ./.envs/.local/.rabbitmq
+      - ./.envs/.production/.google
+      - ./.envs/.production/.rabbitmq
     ports: []
     command: /start-celeryworker
 
@@ -86,8 +86,8 @@ services:
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
-      - ./.envs/.local/.google
-      - ./.envs/.local/.rabbitmq
+      - ./.envs/.production/.google
+      - ./.envs/.production/.rabbitmq
     ports: []
     command: /start-celerybeat
 
