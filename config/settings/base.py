@@ -52,7 +52,7 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # GOOGLE SERVICES
-GOOGLE_GEOCODE_API_KEY = env("GOOGLE_GEOCODE_API_KEY")
+GOOGLE_GEOCODE_API_KEY = env("GOOGLE_GEOCODE_API_KEY", default="your_api_key_here")
 
 # URLS
 # ------------------------------------------------------------------------------
@@ -91,7 +91,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "order_service.users",
     "order_service.core",
-    "order_service.messaging",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

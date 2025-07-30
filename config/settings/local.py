@@ -1,9 +1,10 @@
 # ruff: noqa: E501
+from celery.schedules import crontab
+
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
 from .base import env
-from celery.schedules import crontab
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -69,10 +70,10 @@ INSTALLED_APPS += ["django_extensions"]
 CELERY_TASK_EAGER_PROPAGATES = True
 
 CELERY_BEAT_SCHEDULE = {
-    'backup_postgres_diario': {
-        'task': 'order_service.core.tasks.generate_backup_postgres',
-        'schedule': crontab(hour=2, minute=0),
-        # utilizar 5 minutos para testes minute='*/5'  
+    "backup_postgres_diario": {
+        "task": "order_service.core.tasks.generate_backup_postgres",
+        "schedule": crontab(hour=2, minute=0),
+        # utilizar 5 minutos para testes minute='*/5'
     },
 }
 
