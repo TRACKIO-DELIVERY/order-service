@@ -1,6 +1,7 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
+import datetime
 import ssl
 from pathlib import Path
 
@@ -86,6 +87,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 LOCAL_APPS = [
@@ -317,7 +319,7 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_METHODS = {"email"}
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_SIGNUP_FIELDS = ["email*", "name*", "username*", "password1*", "password2*"]
+ACCOUNT_SIGNUP_FIELDS = ["email*", "name*", "username*", "birth_date*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://docs.allauth.org/en/latest/account/configuration.html
@@ -334,13 +336,27 @@ SOCIALACCOUNT_FORMS = {"signup": "order_service.users.forms.UserSocialSignupForm
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
     ),
-    # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+
+# simplejwt-authentication
+# ------------------------------------------------------------------------------
+
+SIMPLE_JWT = {
+    "TOKEN_OBTAIN_SERIALIZER": "order_service.users.api.serializers.CustomTokenObtainPairSerializer",
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=15),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ISSUER": env("DJANGO_JWT_ISSUER", default="http://localhost:8000"),
+    "SIGNING_KEY": env("JWT_SIGNING_KEY", default="your_signing_key_here"),
+}
+
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"

@@ -1,5 +1,6 @@
 from allauth.account.forms import SignupForm
 from allauth.socialaccount.forms import SignupForm as SocialSignupForm
+from django import forms
 from django.contrib.auth import forms as admin_forms
 from django.utils.translation import gettext_lazy as _
 
@@ -30,6 +31,22 @@ class UserSignupForm(SignupForm):
     Default fields will be added automatically.
     Check UserSocialSignupForm for accounts created from social.
     """
+
+    birth_date = forms.DateField(
+        required=False,
+        label=_("Birth Date"),
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].label = "Nome de Usuário"
+
+    def save(self, request):
+        user = super().save(request)
+        user.birth_date = self.cleaned_data["birth_date"]
+        user.save()
+        return user
 
 
 class UserSocialSignupForm(SocialSignupForm):

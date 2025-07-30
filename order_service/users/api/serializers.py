@@ -1,7 +1,21 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from order_service.users.models import DeliveryPerson
 from order_service.users.models import User
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token["name"] = user.name
+        token["email"] = user.email
+        token["cpf"] = user.cpf
+        token["birth_date"] = user.birth_date.isoformat() if user.birth_date else None
+
+        return token
 
 
 class UserSerializer(serializers.ModelSerializer[User]):
@@ -48,17 +62,25 @@ class UserCreatedSerializer(serializers.ModelSerializer[User]):
         - name (str): The full name of the user.
         - email (str): The user's email address.
         - birth_date (date): The user's date of birth.
-        - is_active (bool): Whether the user account is active.
         - user_type (str): The role of the user (Administrator, Customer, or Delivery Man).
 
     """
 
     class Meta:
         model = User
-        fields = ["name", "email", "birth_date", "is_active", "user_type", "cpf"]
+        fields = ["name", "username", "password", "email", "birth_date", "user_type", "cpf"]
 
     def create(self, validated_data):
-        return super().create(validated_data)
+        return User.objects.create_user(
+            email=validated_data.get("email"),
+            password=validated_data.get("password"),
+            name=validated_data.get("name"),
+            username=validated_data.get("username"),
+            cpf=validated_data.get("cpf"),
+            birth_date=validated_data.get("birth_date"),
+            is_active=validated_data.get("is_active", True),
+            user_type=validated_data.get("user_type"),
+        )
 
 
 class UserUpdateSerializer(serializers.ModelSerializer[User]):

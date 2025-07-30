@@ -32,10 +32,11 @@ class User(AbstractUser):
 
     user_type = models.CharField(max_length=10, choices=UserType, default=UserType.CUSTOMER)
 
-    objects = UserManager.from_queryset(querysets.UserQuerySet)()
+    objects = UserManager()
+    filtered_objects = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "cpf", "username"]
+    REQUIRED_FIELDS = ["name", "cpf", "birth_date", "username"]
 
     def __str__(self):
         return f"{self.name} ({self.user_type})"
