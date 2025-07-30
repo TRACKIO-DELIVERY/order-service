@@ -76,7 +76,3 @@ CELERY_BEAT_SCHEDULE = {
         # utilizar 5 minutos para testes minute='*/5'
     },
 }
-
-
-# Your stuff...
-# ------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ class UserQuerySet(QuerySet):
         return self.filter(user_type__description="Delivery Man")
 
     def order_by_name(self):
-        return self.order_by("full_name")
+        return self.order_by("name")
 
 
 class DeliveryPersonQuerySet(QuerySet):
