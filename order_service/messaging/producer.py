@@ -14,9 +14,7 @@ async def producer(routing_key_name: str, payload: str | dict) -> None:
         routing_key = routing_key_name
         channel: aio_pika.abc.AbstractChannel = await connection.channel()
 
-        exchange = await channel.declare_exchange(
-            "order.direct", aio_pika.ExchangeType.DIRECT, durable=True
-        )
+        exchange = await channel.declare_exchange("order.direct", aio_pika.ExchangeType.DIRECT, durable=True)
 
         channel = await connection.channel()
 

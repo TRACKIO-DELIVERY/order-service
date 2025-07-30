@@ -1,9 +1,11 @@
+import logging
 
-
+from django.db import connection
+from django.db.models.signals import post_migrate
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db import connection
-from messaging.producer import producer
+
+from order_service.messaging.producer import producer
 
 from .models import Order
 
@@ -20,10 +22,9 @@ async def send_message_to_broker(sender, instance, created, **kwargs):
             await producer(routing_key_name="order.created", payload=payload)
             logging.info(f"Message sent to broker for order {instance.id}")
     except Exception as exc:
-        logging.exception(
-            f"Error sending message to broker. Exception: {type(exc).__name__} Message: {exc}"
-        )
-        
+        logging.exception(f"Error sending message to broker. Exception: {type(exc).__name__} Message: {exc}")
+
+
 @receiver(post_migrate)
 def create_audit_trigger(sender, **kwargs):
     with connection.cursor() as cursor:
@@ -146,4 +147,3 @@ def create_audit_trigger(sender, **kwargs):
         END
         $$;
         """)
-
