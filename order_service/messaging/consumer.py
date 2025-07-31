@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     import aio_pika.abc
 
 
+# Consumindo uma fila mandado por outro app
 async def consumer(queue_name: str) -> None:
     """
     Consumer that listens to the queue and processes messages.

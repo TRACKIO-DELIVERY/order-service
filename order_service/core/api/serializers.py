@@ -176,7 +176,6 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
         model = Order
         fields = [
             "id",
-            "url",
             "establishment",
             "email",
             "delivery_person_full_name",
@@ -191,7 +190,6 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
             "updated_at",
         ]
         read_only_fields = fields
-        extra_kwargs = {"url": {"view_name": "api:order-detail", "lookup_field": "pk"}}
 
     def get_full_delivery_address(self, obj: Order):
         if hasattr(obj, "complementary_order") and obj.complementary_order:

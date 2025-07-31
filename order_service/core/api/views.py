@@ -1,10 +1,16 @@
+import logging
+
+from asgiref.sync import async_to_sync
 from django.db import transaction
+from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.response import Response
 
 from order_service.core.models import ComplementaryOrder
 from order_service.core.models import Establishment
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
+from order_service.messaging.producer import producer
 from order_service.services import order_tracking_service
 
 from .serializers import CreateComplementaryOrderSerializer
@@ -141,11 +147,32 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = CreateOrderAlignedSerializer
 
-    def perform_create(self, serializer):
-        with transaction.atomic():
-            order = serializer.save()
-            order_tracking_service.create_tracking_for_order(order)
-            return order
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+
+        order_tracking_service.create_tracking_for_order(order)
+
+        read_data = OrderReadSerializer(order).data
+
+        payload = {
+            "order_id": read_data.get("id"),
+            "email": read_data.get("email") or None,
+            "status": read_data.get("order_status") or None,
+            "delivery_person_full_name": read_data.get("delivery_person_full_name") or None,
+            "delivery_fee": read_data.get("delivery_fee") or None,
+            "full_delivery_address": read_data.get("full_delivery_address") or None,
+            "full_pickup_address": read_data.get("full_pickup_address") or None,
+        }
+
+        try:
+            async_to_sync(producer)(routing_key_name="order.created", payload=payload)
+            logging.info(f"Message sent to broker for order {order.id}")
+        except Exception as exc:
+            logging.exception(f"Error sending message to broker. Exception: {type(exc).__name__} Message: {exc}")
+
+        return Response(read_data, status=status.HTTP_201_CREATED)
 
 
 class EstablishmentViewSet(viewsets.ModelViewSet):
