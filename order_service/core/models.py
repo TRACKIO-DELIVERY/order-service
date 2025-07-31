@@ -3,7 +3,8 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from order_service.users import querysets
+from order_service.core.querysets import EstablishmentQueryset
+from order_service.core.querysets import OrderQuerySet
 from order_service.users.models import DeliveryPerson
 
 auth_user_model = settings.AUTH_USER_MODEL
@@ -42,9 +43,12 @@ class Establishment(TimeStampedModel):
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
     email = models.EmailField()
-    password = models.CharField(max_length=20)
-    active = models.BooleanField()
+    active = models.BooleanField(default=True)
+    phone = models.CharField(max_length=15, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    administrator = models.ForeignKey(auth_user_model, on_delete=models.CASCADE, related_name="establishments")
+
+    objects: EstablishmentQueryset = EstablishmentQueryset.as_manager()
 
     def __str__(self):
         return f"{self.name}, {self.cnpj}"
@@ -69,7 +73,7 @@ class Order(TimeStampedModel):
 
     order_status = models.IntegerField(choices=OrderStatus)
 
-    objects = querysets.OrderQuerySet.as_manager()
+    objects = OrderQuerySet.as_manager()
 
     def __str__(self):
         return f"Order #{self.id}"
@@ -108,7 +112,7 @@ class UserNotification(TimeStampedModel):
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Notification for {self.user.name}"
+        return f"Notification for {self.user.full_name}"
 
 
 class UserLog(models.Model):

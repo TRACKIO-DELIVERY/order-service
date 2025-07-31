@@ -141,10 +141,19 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = CreateOrderAlignedSerializer
 
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            order = serializer.save()
+            order_tracking_service.create_tracking_for_order(order)
+            return order
+
 
 class EstablishmentViewSet(viewsets.ModelViewSet):
     serializer_class = ReadEstablishmentSerializer
     queryset = Establishment.objects.all()
+
+    def get_queryset(self):
+        return Establishment.objects.by_administrator(self.request.user).select_related("administrator")
 
     def get_serializer_class(self):
         if self.action == "create":

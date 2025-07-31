@@ -32,21 +32,43 @@ class UserSignupForm(SignupForm):
     Check UserSocialSignupForm for accounts created from social.
     """
 
+    field_order = [
+        "name",
+        "username",
+        "email",
+        "cpf",
+        "birth_date",
+    ]
+    name = forms.CharField(
+        required=True,
+        label=_("Name"),
+        max_length=255,
+        widget=forms.TextInput(attrs={"placeholder": "Nome Completo"}),
+    )
     birth_date = forms.DateField(
         required=False,
         label=_("Birth Date"),
         widget=forms.DateInput(attrs={"type": "date"}),
     )
+    cpf = forms.CharField(
+        required=True,
+        label=_("CPF"),
+        max_length=11,
+        min_length=11,
+        widget=forms.TextInput(attrs={"placeholder": "12345678901"}),
+        error_messages={
+            "max_length": _("CPF must be 11 digits long."),
+            "min_length": _("CPF must be 11 digits long."),
+        },
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["name"].label = "Nome Completo"
+        self.fields["birth_date"].label = "Data de Nascimento"
+        self.fields["cpf"].label = "CPF"
+        self.fields["email"].label = "E-mail"
         self.fields["username"].label = "Nome de Usuário"
-
-    def save(self, request):
-        user = super().save(request)
-        user.birth_date = self.cleaned_data["birth_date"]
-        user.save()
-        return user
 
 
 class UserSocialSignupForm(SocialSignupForm):

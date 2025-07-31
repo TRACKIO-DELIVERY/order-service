@@ -475,7 +475,7 @@ class ReadEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
 
     class Meta:
         model = Establishment
-        fields = ["name", "cnpj", "email", "password", "active", "address"]
+        fields = ["id", "name", "cnpj", "email", "active", "address"]
         read_only_fields = fields
         extra_kwargs = {
             "url": {"view_name": "api:establishment-detail", "lookup_field": "pk"},
@@ -484,10 +484,12 @@ class ReadEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
 
 class CreatedEstablishmentSerializer(serializers.ModelSerializer):
     address = CreatedAddressSerializer()
+    active = serializers.HiddenField(default=True)
+    administrator = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Establishment
-        fields = ["name", "cnpj", "email", "password", "active", "address"]
+        fields = ["name", "cnpj", "email", "active", "address", "administrator", "phone"]
 
     def create(self, validated_data):
         address_data = validated_data.pop("address")
@@ -502,7 +504,7 @@ class CreatedEstablishmentSerializer(serializers.ModelSerializer):
 class UpdateEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
     class Meta:
         model = Establishment
-        fields = ["name", "email", "password", "active", "address"]
+        fields = ["name", "email", "active", "address"]
         read_only_fields = ["cnpj"]
 
     def update(self, instance, validated_data):

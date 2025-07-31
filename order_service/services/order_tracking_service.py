@@ -1,3 +1,5 @@
+import logging
+
 from django.utils import timezone
 
 from order_service.core.models import ComplementaryOrder
@@ -9,11 +11,14 @@ def create_tracking_for_order(order):
     try:
         comp_order = ComplementaryOrder.objects.get(order=order)
 
+        address = order.establishment.address
+
         pickup_address = (
-            f"{comp_order.pickup_street}, {comp_order.pickup_number}, "
-            f"{comp_order.pickup_neighborhood}, {comp_order.pickup_city}, "
-            f"{comp_order.pickup_state}, {comp_order.pickup_country}"
+            f"{address.street}, {address.number}, "
+            f"{address.neighborhood}, {address.city}, "
+            f"{address.state}, {address.country}"
         )
+
         delivery_address = (
             f"{comp_order.delivery_street}, {comp_order.delivery_number}, "
             f"{comp_order.delivery_neighborhood}, {comp_order.delivery_city}, "
@@ -22,7 +27,11 @@ def create_tracking_for_order(order):
 
         pickup_coords = GeoocodeService.address_to_coordinates(pickup_address)
         delivery_coords = GeoocodeService.address_to_coordinates(delivery_address)
-
+        logging.info(
+            f"Coordenadas obtidas para Order#{order.id}: "
+            f"Pickup({pickup_coords['lat']}, {pickup_coords['lng']}), "
+            f"Delivery({delivery_coords['lat']}, {delivery_coords['lng']})"
+        )
         return OrderTracking.objects.create(
             order=order,
             start_latitude=str(pickup_coords["lat"]),
@@ -32,5 +41,13 @@ def create_tracking_for_order(order):
             timestamp=timezone.now(),
         )
 
+    except ValueError as e:
+        logging.exception(
+            f"Erro ao criar as coordenadas para o Order#{order.id}: {e!s}. Certifique que o endereço está correto."
+        )
+
     except ComplementaryOrder.DoesNotExist:
-        raise Exception("Complementary order not found.")  # noqa: B904
+        logging.exception(
+            f"Complementary order não encontrado para Order#{order.id}. "
+            "Certifique que Order tem um Complementary Order."
+        )
