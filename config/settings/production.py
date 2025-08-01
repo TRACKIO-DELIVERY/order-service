@@ -133,6 +133,7 @@ EMAIL_HOST = env(
     "DJANGO_EMAIL_HOST",
     default="smtp.gmail.com",
 )
+EMAIL_PORT = env.int("DJANGO_EMAIL_PORT", default=465)
 EMAIL_HOST_USER = env(
     "DJANGO_EMAIL_HOST_USER",
     default="trackio.system@gmail.com",
@@ -140,6 +141,10 @@ EMAIL_HOST_USER = env(
 EMAIL_HOST_PASSWORD = env(
     "DJANGO_EMAIL_HOST_PASSWORD",
     default="",
+)
+EMAIL_USE_SSL = env.bool(
+    "DJANGO_EMAIL_USE_SSL",
+    default=True,
 )
 
 # ADMIN
