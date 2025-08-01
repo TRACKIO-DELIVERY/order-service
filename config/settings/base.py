@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "django_celery_beat",
     "rest_framework",
     "rest_framework.authtoken",
@@ -359,9 +360,31 @@ SIMPLE_JWT = {
 }
 
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "OAUTH_PKCE_ENABLED": True,
+        "APPS": [
+            {
+                "client_id": env("GOOGLE_CLIENT_ID", default="your_client_id_here"),
+                "secret": env("GOOGLE_CLIENT_SECRET", default="your_client_secret_here"),
+                "key": env("GOOGLE_API_KEY", default=""),
+                "name": "google",
+            }
+        ],
+    }
+}
+
+
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
 CORS_URLS_REGEX = r"^/api/.*$"
 
+CORS_ALLOWED_ORIGINS_ALLOW_ALL = env.bool("DJANGO_CORS_ALLOW_ALL_ORIGINS", False)
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+]
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that
 # See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
 SPECTACULAR_SETTINGS = {
