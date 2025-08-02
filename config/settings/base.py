@@ -344,8 +344,8 @@ SOCIALACCOUNT_PROVIDERS = {
         "EMAIL_AUTHENTICATION": True,
         "APPS": [
             {
-                "client_id": env("GOOGLE_CLIENT_ID"),
-                "secret": env("GOOGLE_SECRET_KEY"),
+                "client_id": env("GOOGLE_CLIENT_ID", default="client_id_here"),
+                "secret": env("GOOGLE_SECRET_KEY", default="client_secret_here"),
                 "key": "",
                 "name": "google",
             }
