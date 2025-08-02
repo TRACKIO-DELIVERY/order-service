@@ -62,6 +62,24 @@ class UserSignupForm(SignupForm):
         },
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        cpf = cleaned_data.get("cpf")
+        if cpf and not cpf.isdigit():
+            raise forms.ValidationError(_("CPF must contain only digits."))
+
+        user = User(
+            name=cleaned_data.get("name"),
+            username=cleaned_data.get("username"),
+            email=cleaned_data.get("email"),
+            cpf=cpf,
+            birth_date=cleaned_data.get("birth_date"),
+        )
+        user.validate_unique()
+
+        return cleaned_data
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["name"].label = "Nome Completo"

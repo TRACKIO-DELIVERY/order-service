@@ -322,7 +322,7 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_SIGNUP_FIELDS = ["email*", "name*", "cpf*", "username*", "birth_date*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "order_service.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
@@ -332,19 +332,26 @@ SOCIALACCOUNT_ADAPTER = "order_service.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "order_service.users.forms.UserSocialSignupForm"}
 
-# django-rest-framework
-# -------------------------------------------------------------------------------
-# django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
-}
+SOCIALACCOUNT_LOGIN_ON_GET = False
 
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "FETCH_USERINFO": True,
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "OAUTH_PKCE_ENABLED": True,
+        "EMAIL_AUTHENTICATION": True,
+        "APPS": [
+            {
+                "client_id": env("GOOGLE_CLIENT_ID"),
+                "secret": env("GOOGLE_SECRET_KEY"),
+                "key": "",
+                "name": "google",
+            }
+        ],
+    }
+}
 
 # simplejwt-authentication
 # ------------------------------------------------------------------------------
@@ -360,20 +367,16 @@ SIMPLE_JWT = {
 }
 
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
-        "OAUTH_PKCE_ENABLED": True,
-        "APPS": [
-            {
-                "client_id": env("GOOGLE_CLIENT_ID", default="your_client_id_here"),
-                "secret": env("GOOGLE_CLIENT_SECRET", default="your_client_secret_here"),
-                "key": env("GOOGLE_API_KEY", default=""),
-                "name": "google",
-            }
-        ],
-    }
+# -------------------------------------------------------------------------------
+# django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
 }
 
 

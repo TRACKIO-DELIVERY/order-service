@@ -25,18 +25,18 @@ class User(AbstractUser):
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
     first_name = None  # type: ignore[assignment]
     last_name = None  # type: ignore[assignment]
-    cpf = models.CharField(max_length=11, unique=True, null=False)
-    birth_date = models.DateField(null=True)
+    cpf = models.CharField(_("CPF"), max_length=11, null=True, blank=True, default=None, unique=True)
+    birth_date = models.DateField(_("Birth Date"), blank=True, null=True)
     email = models.EmailField(max_length=250, unique=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(_("Is Active"), default=True)
 
-    user_type = models.CharField(max_length=10, choices=UserType, default=UserType.CUSTOMER)
+    user_type = models.CharField(_("User type"), max_length=10, choices=UserType, default=UserType.CUSTOMER)
 
     objects = UserManager()
     filtered_objects = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "cpf", "birth_date", "username"]
+    REQUIRED_FIELDS = ["name", "username"]
 
     def __str__(self):
         return f"{self.name} ({self.user_type})"

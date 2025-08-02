@@ -101,7 +101,7 @@ class OrderTracking(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Tracking {self.order.id} - {self.event_status}"
+        return f"Tracking {self.order.id}"
 
 
 class UserNotification(TimeStampedModel):

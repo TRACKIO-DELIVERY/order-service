@@ -1,3 +1,4 @@
+from rest_framework import permissions
 from rest_framework import viewsets
 
 from order_service.users.models import DeliveryPerson
@@ -39,6 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
         - DELETE /api/users/{id}/      → Delete a user
     """
 
+    permission_classes = [permissions.AllowAny]
     serializer_class = UserReadSerializer
     queryset = User.objects.all()
 
