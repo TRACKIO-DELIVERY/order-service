@@ -332,7 +332,7 @@ SOCIALACCOUNT_ADAPTER = "order_service.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "order_service.users.forms.UserSocialSignupForm"}
 
-SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 SOCIALACCOUNT_PROVIDERS = {
