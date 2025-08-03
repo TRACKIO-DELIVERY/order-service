@@ -94,6 +94,7 @@ class Order(TimeStampedModel):
     establishment = models.ForeignKey(Establishment, on_delete=models.CASCADE)
     email = models.CharField(max_length=100)
     delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
+    url = models.CharField(max_length=100,blank=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
     order_value = models.DecimalField(max_digits=10, decimal_places=2)
     closing_date = models.DateTimeField(null=True, blank=True)
@@ -129,7 +130,7 @@ class OrderTracking(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Tracking {self.order.id} - {self.event_status}"
+        return f"Tracking {self.order.id}"
 
 
 class UserNotification(TimeStampedModel):

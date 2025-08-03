@@ -6,14 +6,30 @@ from order_service.services.geocode_service import GeoocodeService
 
 
 def create_tracking_for_order(order):
+    """
+    Creates an OrderTracking object for a given order.
+
+    This function retrieves the pickup and delivery addresses associated with an
+    order and its complementary details. It uses a geocoding service to convert
+    these addresses into latitude and longitude coordinates. Finally, it creates
+    a new `OrderTracking` object with these coordinates and a timestamp.
+
+    Args:
+        order: The `Order` model instance for which to create tracking information.
+
+    Returns:
+        OrderTracking: The newly created `OrderTracking` object.
+
+    Raises:
+        ComplementaryOrder.DoesNotExist: If a `ComplementaryOrder` instance
+                                        corresponding to the provided order is not found.
+        Exception: If any other error occurs during the geocoding process.
+    """
     try:
-        print(order)
         comp_order = ComplementaryOrder.objects.get(order=order)
 
         address = order.establishment.address
 
-        print(address)
-        print(comp_order)
 
         pickup_address = (
             f"{address.street}, {address.number}, "
@@ -39,4 +55,4 @@ def create_tracking_for_order(order):
         )
 
     except ComplementaryOrder.DoesNotExist:
-        raise Exception("Complementary order not found.")  # noqa: B904
+        raise Exception("Complementary order not found.")
