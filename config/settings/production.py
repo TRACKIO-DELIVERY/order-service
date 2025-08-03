@@ -205,7 +205,7 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [
-    {"url": "https://example.com", "description": "Production server"},
+    {"url": "https://trackio-oc.amisahdev.com.br", "description": "Production server"},
 ]
 
 CELERY_TASK_EAGER_PROPAGATES = False
