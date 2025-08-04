@@ -3,12 +3,11 @@ import random
 import string
 
 from allauth.socialaccount.models import SocialAccount
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import UserManager
 from django.db.models import QuerySet
 
-env = settings.env
+from config.settings.base import env
 
 
 def get_username_not_used(username):

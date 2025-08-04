@@ -24,6 +24,8 @@ urlpatterns = [
     # User management
     path("users/", include("order_service.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
+    # Django Prometheus
+    path("", include("django_prometheus.urls")),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

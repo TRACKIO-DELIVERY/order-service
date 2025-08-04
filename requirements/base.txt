@@ -24,3 +24,4 @@ drf-spectacular==0.28.0  # https://github.com/tfranzel/drf-spectacular
 aio-pika==9.5.5
 djangorestframework_simplejwt==5.5.1
 google-auth==2.40.3
+django-prometheus==2.4.1

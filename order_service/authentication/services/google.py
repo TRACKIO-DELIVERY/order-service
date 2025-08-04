@@ -1,13 +1,12 @@
 import logging
 
-from authentication.exceptions import SocialAuthException
-from authentication.exceptions import TokenInvalidOrExpired
-from django.conf import settings
 from google.auth.exceptions import GoogleAuthError
 from google.auth.transport import requests as google_request
 from google.oauth2 import id_token
 
-env = settings.env
+from config.settings.base import env
+from order_service.authentication.exceptions import SocialAuthException
+from order_service.authentication.exceptions import TokenInvalidOrExpired
 
 CLIENT_ID_PER_DEVICE = {
     "mobile": env("GOOGLE_CLIENT_ID_MOBILE"),
