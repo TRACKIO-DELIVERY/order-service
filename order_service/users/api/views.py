@@ -1,5 +1,11 @@
+import logging
+
+from django.core.exceptions import ValidationError
+from rest_framework import exceptions
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.response import Response
 
 from order_service.users.models import DeliveryPerson
 from order_service.users.models import User
@@ -40,9 +46,22 @@ class UserViewSet(viewsets.ModelViewSet):
         - DELETE /api/users/{id}/      → Delete a user
     """
 
+    ##ver isso aqui
     permission_classes = [permissions.AllowAny]
     serializer_class = UserReadSerializer
     queryset = User.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as exc:
+            logging.exception(f"Validation error during user creation: {exc}")
+            raise exceptions.ValidationError({"error": exc.detail}) from exc
+        except exceptions.ValidationError as exc:
+            logging.exception(f"Validation error during user creation: {exc}")
+            return Response({"error": exc.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:
+            return Response(f"An unexpected error occurred: {exc}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -53,7 +72,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
         is_active = self.request.query_params.get("is_active", None)
         if is_active is not None:
             if is_active.lower() == "true":
@@ -66,9 +84,9 @@ class UserViewSet(viewsets.ModelViewSet):
             if user_type == "Customer":
                 queryset = queryset.customers()
             elif user_type == "Administrator":
-                queryset = queryset.administrator
+                queryset = queryset.administrator()
             elif user_type == "Delivery Man":
-                queryset = queryset.delivery_man
+                queryset = queryset.delivery_man()
 
         return queryset
 
@@ -99,6 +117,18 @@ class DeliveryPersonViewSet(viewsets.ModelViewSet):
 
     queryset = DeliveryPerson.objects.all().select_related("user")
     serializer_class = DeliveryPersonReadSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as exc:
+            logging.exception(f"Validation error during delivery person creation: {exc}")
+            raise exceptions.ValidationError({"error": exc.detail}) from exc
+        except exceptions.ValidationError as exc:
+            logging.exception(f"Validation error during user creation: {exc}")
+            return Response({"error": exc.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:
+            return Response(f"An unexpected error occurred: {exc}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_serializer_class(self):
         if self.action == "create":

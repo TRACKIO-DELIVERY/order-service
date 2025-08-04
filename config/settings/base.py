@@ -320,7 +320,7 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_METHODS = {"email"}
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_SIGNUP_FIELDS = ["email*", "name*", "cpf*", "username*", "birth_date*", "password1*", "password2*"]
+ACCOUNT_SIGNUP_FIELDS = ["email*", "name*", "cpf", "username*", "birth_date*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "none"
 # https://docs.allauth.org/en/latest/account/configuration.html
@@ -333,7 +333,6 @@ SOCIALACCOUNT_ADAPTER = "order_service.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "order_service.users.forms.UserSocialSignupForm"}
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
-
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {

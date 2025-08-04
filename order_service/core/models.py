@@ -1,5 +1,5 @@
 # Create your models here.
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
@@ -7,7 +7,7 @@ from order_service.core.querysets import EstablishmentQueryset
 from order_service.core.querysets import OrderQuerySet
 from order_service.users.models import DeliveryPerson
 
-auth_user_model = settings.AUTH_USER_MODEL
+User = get_user_model()
 
 
 # Models Abstract
@@ -46,7 +46,7 @@ class Establishment(TimeStampedModel):
     active = models.BooleanField(default=True)
     phone = models.CharField(max_length=15, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
-    administrator = models.ForeignKey(auth_user_model, on_delete=models.CASCADE, related_name="establishments")
+    administrator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="establishments")
 
     objects: EstablishmentQueryset = EstablishmentQueryset.as_manager()
 
@@ -105,7 +105,7 @@ class OrderTracking(models.Model):
 
 
 class UserNotification(TimeStampedModel):
-    user = models.ForeignKey(auth_user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     delivery_channel = models.CharField(max_length=50)
     sent_at = models.DateTimeField(default=timezone.now)
@@ -116,7 +116,7 @@ class UserNotification(TimeStampedModel):
 
 
 class UserLog(models.Model):
-    user = models.ForeignKey(auth_user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.CharField(max_length=50)
     msg = models.JSONField(null=True, blank=True)
     timestamp = models.DateTimeField(default=timezone.now)
@@ -126,7 +126,7 @@ class UserLog(models.Model):
 
 
 class AccessLog(models.Model):
-    user = models.ForeignKey(auth_user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.CharField(max_length=50)
     origin_ip = models.CharField(max_length=45)
     timestamp = models.DateTimeField(default=timezone.now)

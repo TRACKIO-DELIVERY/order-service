@@ -173,6 +173,9 @@ LOGGING = {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
+        "json": {
+            "format": '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "name": "%(name)s", "message": "%(message)s", "module": "%(module)s", "process": %(process)d, "thread": %(thread)d}',
+        },
     },
     "handlers": {
         "mail_admins": {
@@ -183,7 +186,7 @@ LOGGING = {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
+            "formatter": "json",
         },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
@@ -205,7 +208,7 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [
-    {"url": "https://trackio-oc.amisahdev.com.br", "description": "Production server"},
+    {"url": "https://trackio.amisahdev.com.br", "description": "Production server"},
 ]
 
 CELERY_TASK_EAGER_PROPAGATES = False

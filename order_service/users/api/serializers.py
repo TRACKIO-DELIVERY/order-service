@@ -60,11 +60,18 @@ class UserCreatedSerializer(serializers.ModelSerializer[User]):
 
     Fields:
         - name (str): The full name of the user.
+        - username (str): The username for the user, defaults to an empty string if not provided.
         - email (str): The user's email address.
         - birth_date (date): The user's date of birth.
+        - password (str): The user's password, which is write-only and required for creation.
+        - cpf (str): The user's CPF (Cadastro de Pessoas Físicas), a unique identifier in Brazil.
         - user_type (str): The role of the user (Administrator, Customer, or Delivery Man).
 
     """
+
+    password = serializers.CharField(write_only=True, required=True)
+    cpf = serializers.CharField(required=False, allow_blank=True, default=None)
+    username = serializers.CharField(required=False, allow_blank=True, default="")
 
     class Meta:
         model = User
@@ -75,10 +82,9 @@ class UserCreatedSerializer(serializers.ModelSerializer[User]):
             email=validated_data.get("email"),
             password=validated_data.get("password"),
             name=validated_data.get("name"),
-            username=validated_data.get("username"),
+            username=validated_data.get("username", ""),
             cpf=validated_data.get("cpf"),
             birth_date=validated_data.get("birth_date"),
-            is_active=validated_data.get("is_active", True),
             user_type=validated_data.get("user_type"),
         )
 
@@ -156,11 +162,16 @@ class DeliveryPersonReadSerializer(serializers.ModelSerializer[DeliveryPerson]):
 
 
 class DeliveryPersonCreatedSerializer(serializers.ModelSerializer[DeliveryPerson]):
+    user = UserCreatedSerializer()
+
     class Meta:
         model = DeliveryPerson
         fields = ["user", "availability", "vehicle", "license_plate"]
 
     def create(self, validated_data):
+        user_data = validated_data.pop("user")
+        user = UserCreatedSerializer.create(UserCreatedSerializer(), validated_data=user_data)
+        validated_data["user"] = user
         return super().create(validated_data)
 
 

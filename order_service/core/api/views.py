@@ -176,7 +176,7 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
 
 
 class EstablishmentViewSet(viewsets.ModelViewSet):
-    serializer_class = ReadEstablishmentSerializer
+    serializer_class = CreatedEstablishmentSerializer
     queryset = Establishment.objects.all()
 
     def get_queryset(self):
