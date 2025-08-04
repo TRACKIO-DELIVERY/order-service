@@ -95,7 +95,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "order_service.users",
     "order_service.core",
-    # Your stuff: custom apps go here
+    "order_service.authentication",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -334,29 +334,11 @@ SOCIALACCOUNT_FORMS = {"signup": "order_service.users.forms.UserSocialSignupForm
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "FETCH_USERINFO": True,
-        "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
-        "OAUTH_PKCE_ENABLED": True,
-        "EMAIL_AUTHENTICATION": True,
-        "APPS": [
-            {
-                "client_id": env("GOOGLE_CLIENT_ID", default="client_id_here"),
-                "secret": env("GOOGLE_SECRET_KEY", default="client_secret_here"),
-                "key": "",
-                "name": "google",
-            }
-        ],
-    }
-}
-
 # simplejwt-authentication
 # ------------------------------------------------------------------------------
 
 SIMPLE_JWT = {
-    "TOKEN_OBTAIN_SERIALIZER": "order_service.users.api.serializers.CustomTokenObtainPairSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "order_service.auth.api.serializers.CustomTokenObtainPairSerializer",
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
