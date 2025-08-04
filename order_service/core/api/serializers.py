@@ -585,6 +585,41 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
         return order
 
 
+class CreateDeliveryPersonAlignedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ComplementaryOrder model.
+    Captures delivery and pickup address details.
+    """
+
+    class Meta:
+        model = DeliveryPerson
+        fields = [ 
+            "availability", 
+            "vehicle", 
+            "license_plate"
+        ]
+class CreateUserAlignedSerializer(serializers.ModelSerializer):
+    delivery_person = CreateDeliveryPersonAlignedSerializer(source="deliveryperson")
+
+    class Meta:
+        model = User
+        fields = [
+            "full_name", 
+            "email", 
+            "birth_date", 
+            "is_active", 
+            "user_type", 
+            "cpf",
+            "delivery_person", 
+        ]
+
+    def create(self, validated_data):
+        delivery_data = validated_data.pop("deliveryperson")
+        user = User.objects.create(**validated_data)
+        DeliveryPerson.objects.create(user=user, **delivery_data)
+        return user
+
+
 class ReadAddressSerializer(serializers.ModelSerializer[Address]):
     class Meta:
         model = Address

@@ -49,7 +49,7 @@ class User(TimeStampedModel):
 
 
 class DeliveryPerson(TimeStampedModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="deliveryperson")
     availability = models.CharField(max_length=50)
     vehicle = models.CharField(max_length=50)
     license_plate = models.CharField(max_length=50)

@@ -32,6 +32,7 @@ from .serializers import UpdateEstablishmentSerializer
 from .serializers import UserCreatedSerializer
 from .serializers import UserReadSerializer
 from .serializers import UserUpdateSerializer
+from .serializers import CreateUserAlignedSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -297,3 +298,7 @@ class EstablishmentViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return UpdateEstablishmentSerializer
         return ReadEstablishmentSerializer
+
+class UserAlignedViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = CreateUserAlignedSerializer
