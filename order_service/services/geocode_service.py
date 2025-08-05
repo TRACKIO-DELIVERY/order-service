@@ -1,3 +1,5 @@
+import logging
+
 import requests
 from django.conf import settings
 
@@ -13,6 +15,10 @@ class GeoocodeService:
         data = response.json()
 
         if data["status"] != "OK":
+            logging.error(
+                f"Erro ao converter endereço: {address}. "
+                f"Status: {data['status']}, Mensagem: {data.get('error_message', 'N/A')}"
+            )
             raise ValueError("Erro ao converter endereço.")
 
         location = data["results"][0]["geometry"]["location"]

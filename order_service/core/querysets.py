@@ -1,30 +1,6 @@
 from django.db.models import QuerySet
 
 
-class UserQuerySet(QuerySet):
-    def active(self):
-        return self.filter(is_active=True)
-
-    def inactive(self):
-        return self.filter(is_active=False)
-
-    def customers(self):
-        return self.filter(user_type__description="Customer")
-
-    def administrator(self):
-        return self.filter(user_type__description="Administrator")
-
-    def delivery_man(self):
-        return self.filter(user_type__description="Delivery Man")
-
-    def order_by_name(self):
-        return self.order_by("full_name")
-
-
-class DeliveryPersonQuerySet(QuerySet):
-    pass
-
-
 class OrderQuerySet(QuerySet):
     def status_waiting_collection(self):
         return self.filter(status__description="Waiting for Collection")
@@ -40,3 +16,17 @@ class OrderQuerySet(QuerySet):
 
     def status_in_production(self):
         return self.filter(status__description="In Production")
+
+
+class EstablishmentQueryset(QuerySet):
+    def by_administrator(self, user):
+        """
+        Returns establishments managed by the given user.
+        """
+        return self.filter(administrator=user)
+
+    def active(self):
+        """
+        Returns only active establishments.
+        """
+        return self.filter(active=True)

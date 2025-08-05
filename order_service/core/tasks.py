@@ -27,7 +27,7 @@ def generate_backup_postgres():
     comando = [
         "docker",
         "exec",
-        "order_service_local_postgres",
+        "order_service_postgres",
         "pg_dump",
         "-U",
         "PjuHeKcBPyqGCsZHUouCBBTuySoOnWfT",
@@ -87,3 +87,4 @@ def consumer_order_accepted():
         logging.info("Pedido processado com sucesso.")
     else:
         logging.warning("Erro ao processar o pedido.")
+        logging.exception(f"[BACKUP ERRO] {e.stderr}")

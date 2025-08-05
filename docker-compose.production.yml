@@ -12,6 +12,7 @@ services:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
 
+    container_name: order_service_django
     image: order_service_production_django
     depends_on:
       - postgres
@@ -27,6 +28,8 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
+
+    container_name: order_service_postgres
     image: order_service_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data
@@ -35,18 +38,28 @@ services:
       - ./.envs/.production/.postgres
 
   redis:
+    container_name: order_service_redis
     image: docker.io/redis:6
 
     volumes:
       - production_redis_data:/data
 
-
   celeryworker:
     <<: *django
+
+    container_name: order_service_celeryworker
     image: order_service_production_celeryworker
     command: /start-celeryworker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - production_postgres_data_backups:/backups
+    depends_on:
+      - django
 
   celerybeat:
     <<: *django
+    container_name: order_service_celerybeat
     image: order_service_production_celerybeat
     command: /start-celerybeat
+    depends_on:
+      - django

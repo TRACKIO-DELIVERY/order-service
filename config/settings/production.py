@@ -1,4 +1,6 @@
 # ruff: noqa: E501
+from celery.schedules import crontab
+
 from .base import *  # noqa: F403
 from .base import DATABASES
 from .base import INSTALLED_APPS
@@ -126,24 +128,29 @@ EMAIL_SUBJECT_PREFIX = env(
 )
 ACCOUNT_EMAIL_SUBJECT_PREFIX = EMAIL_SUBJECT_PREFIX
 
+
+EMAIL_HOST = env(
+    "DJANGO_EMAIL_HOST",
+    default="smtp.gmail.com",
+)
+EMAIL_PORT = env.int("DJANGO_EMAIL_PORT", default=465)
+EMAIL_HOST_USER = env(
+    "DJANGO_EMAIL_HOST_USER",
+    default="trackio.system@gmail.com",
+)
+EMAIL_HOST_PASSWORD = env(
+    "DJANGO_EMAIL_HOST_PASSWORD",
+    default="",
+)
+EMAIL_USE_SSL = env.bool(
+    "DJANGO_EMAIL_USE_SSL",
+    default=True,
+)
+
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL regex.
 ADMIN_URL = env("DJANGO_ADMIN_URL")
-
-# Anymail
-# ------------------------------------------------------------------------------
-# https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
-INSTALLED_APPS += ["anymail"]
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-# https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-# https://anymail.readthedocs.io/en/stable/esps/mailgun/
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-ANYMAIL = {
-    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
-    "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
-}
 
 # Collectfasta
 # ------------------------------------------------------------------------------
@@ -166,6 +173,9 @@ LOGGING = {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
+        "json": {
+            "format": '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "name": "%(name)s", "message": "%(message)s", "module": "%(module)s", "process": %(process)d, "thread": %(thread)d}',
+        },
     },
     "handlers": {
         "mail_admins": {
@@ -176,7 +186,7 @@ LOGGING = {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
+            "formatter": "json",
         },
     },
     "root": {"level": "INFO", "handlers": ["console"]},
@@ -198,7 +208,14 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [
-    {"url": "https://example.com", "description": "Production server"},
+    {"url": "https://trackio.amisahdev.com.br", "description": "Production server"},
 ]
-# Your stuff...
-# ------------------------------------------------------------------------------
+
+CELERY_TASK_EAGER_PROPAGATES = False
+
+CELERY_BEAT_SCHEDULE = {
+    "backup_postgres_diario": {
+        "task": "order_service.core.tasks.generate_backup_postgres",
+        "schedule": crontab(hour=2, minute=0),
+    },
+}

@@ -3,12 +3,12 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
 
 from order_service.core.api.views import ComplementaryOrderViewSet
-from order_service.core.api.views import DeliveryPersonViewSet
 from order_service.core.api.views import EstablishmentViewSet
 from order_service.core.api.views import OrderAlignedViewSet
 from order_service.core.api.views import OrderTrackingViewSet
 from order_service.core.api.views import OrderViewSet
-from order_service.core.api.views import UserViewSet
+from order_service.users.api.views import DeliveryPersonViewSet
+from order_service.users.api.views import UserViewSet
 from order_service.core.api.views import UserAlignedViewSet
 
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()

@@ -1,8 +1,13 @@
 # Create your models here.
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
-from . import querysets
+from order_service.core.querysets import EstablishmentQueryset
+from order_service.core.querysets import OrderQuerySet
+from order_service.users.models import DeliveryPerson
+
+User = get_user_model()
 
 
 # Models Abstract
@@ -22,42 +27,6 @@ class TimeStampedModel(CreatedAtModel):
         abstract = True
 
 
-# Models Main
-
-
-class UserType(models.IntegerChoices):
-    ADMINISTRATOR = 1, "Administrator"
-    CUSTOMER = 2, "Customer"
-    DELIVERY_MAN = 3, "Delivery Man"
-    System = 4, "System"  # Validar se seria Interesssante
-
-
-class User(TimeStampedModel):
-    full_name = models.CharField(max_length=250)
-    cpf = models.CharField(max_length=11, unique=True)
-    birth_date = models.DateField()
-    email = models.EmailField(max_length=250)
-    password = models.CharField(max_length=50)
-    is_active = models.BooleanField(default=True)
-
-    user_type = models.IntegerField(choices=UserType)
-
-    objects = querysets.UserQuerySet.as_manager()
-
-    def __str__(self):
-        return self.full_name
-
-
-class DeliveryPerson(TimeStampedModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="deliveryperson")
-    availability = models.CharField(max_length=50)
-    vehicle = models.CharField(max_length=50)
-    license_plate = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"Delivery Person {self.user.full_name}"
-
-
 class Address(models.Model):
     street = models.CharField(max_length=100)
     neighborhood = models.CharField(max_length=100)
@@ -74,9 +43,12 @@ class Establishment(TimeStampedModel):
     name = models.CharField(max_length=100)
     cnpj = models.CharField(max_length=100)
     email = models.EmailField()
-    password = models.CharField(max_length=20)
-    active = models.BooleanField()
+    active = models.BooleanField(default=True)
+    phone = models.CharField(max_length=15, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    administrator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="establishments")
+
+    objects: EstablishmentQueryset = EstablishmentQueryset.as_manager()
 
     def __str__(self):
         return f"{self.name}, {self.cnpj}"
@@ -102,7 +74,7 @@ class Order(TimeStampedModel):
 
     order_status = models.IntegerField(choices=OrderStatus)
 
-    objects = querysets.OrderQuerySet.as_manager()
+    objects = OrderQuerySet.as_manager()
 
     def __str__(self):
         return f"Order #{self.id}"
