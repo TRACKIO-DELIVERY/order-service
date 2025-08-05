@@ -42,6 +42,6 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
                 "access": str(refresh.access_token),
             }
 
-        except (SocialAuthException, TokenInvalidOrExpired):
+        except (SocialAuthException, TokenInvalidOrExpired) as exc:
             logging.exception("Google social login failed")
-        return None
+            raise serializers.ValidationError("Invalid authentication token") from exc

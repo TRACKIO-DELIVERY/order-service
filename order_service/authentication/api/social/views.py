@@ -1,6 +1,9 @@
+import logging
+
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from .serializers import GoogleSocialAuthSerializer
@@ -21,6 +24,9 @@ class GoogleAuthView(APIView):
         Initiates Google authentication process.
         """
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
+        try:
+            serializer.is_valid(raise_exception=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"error": "Authentication Failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except ValidationError as exc:
+            logging.exception(f"Google Authentication failed. Message: {exc}")
+            return Response({"error": "Authentication Failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

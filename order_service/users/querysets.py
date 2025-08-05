@@ -52,7 +52,7 @@ class UserManagerCustom(UserManager):
         """
         user = self.filter(email__iexact=email).first()
         if not user:
-            user = self.model(email=email, **extra_fields)
+            user = self.model(name=name, email=email)
             username = extra_fields.get("username") if extra_fields.get("username") != "" else email.split("@")[0]
             user.username = get_username_not_used(username)
             user.set_password(env("SOCIAL_PASSWORD_SECRET"))
