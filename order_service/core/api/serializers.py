@@ -2,148 +2,9 @@ from rest_framework import serializers
 
 from order_service.core.models import Address
 from order_service.core.models import ComplementaryOrder
-from order_service.core.models import DeliveryPerson
 from order_service.core.models import Establishment
 from order_service.core.models import Order
 from order_service.core.models import OrderTracking
-from order_service.core.models import User
-
-
-class UserReadSerializer(serializers.ModelSerializer[User]):
-    """
-    Read-only serializer for the User model.
-
-    This serializer is used to represent user data in read operations (e.g., GET requests),
-    ensuring that all returned fields are read-only.
-
-    Returned fields:
-        - full_name (str): The user's full name.
-        - is_active (bool): Indicates whether the user is active.
-        - user_type (str): The type of user (Administrator, Customer, or Delivery Man).
-
-    All fields are marked as read-only.
-    """
-
-    class Meta:
-        model = User
-        fields = ["id", "full_name", "is_active", "user_type"]
-        read_only_fields = fields
-
-
-class UserCreatedSerializer(serializers.ModelSerializer[User]):
-    """
-
-    Serializer for creating User instances.
-
-    This serializer is used during user creation processes, such as registration.
-    It allows setting key user attributes including full name, email, birth date,
-    active status, and user type.
-
-    Fields:
-        - full_name (str): The full name of the user.
-        - email (str): The user's email address.
-        - birth_date (date): The user's date of birth.
-        - is_active (bool): Whether the user account is active.
-        - user_type (str): The role of the user (Administrator, Customer, or Delivery Man).
-
-    """
-
-    class Meta:
-        model = User
-        fields = ["full_name", "email", "birth_date", "is_active", "user_type", "cpf"]
-
-    def create(self, validated_data):
-        return super().create(validated_data)
-
-
-class UserUpdateSerializer(serializers.ModelSerializer[User]):
-    """
-
-    Serializer for updating User instances.
-
-    This serializer is used to update user data, including their name, active status,
-    and user role. Some fields are marked as read-only and cannot be modified.
-
-    Writable fields:
-        - full_name (str): The full name of the user.
-        - is_active (bool): Indicates whether the user account is active.
-        - user_type (str): The user's role (Administrator, Customer, or Delivery Man).
-
-    Read-only fields:
-        - cpf (str): The user's CPF (unique identifier).
-        - birth_date (date): The user's date of birth.
-
-    """
-
-    class Meta:
-        model = User
-        fields = ["full_name", "email", "is_active", "user_type", "cpf", "birth_date"]
-        read_only_fields = ["cpf", "birth_date"]
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
-
-
-class DeliveryPersonReadSerializer(serializers.ModelSerializer[DeliveryPerson]):
-    """
-
-    Read-only serializer for the DeliveryPerson model.
-
-    This serializer is used to present delivery person information in read operations
-    (e.g., GET requests), including user details and delivery-specific attributes.
-
-    Nested Serializers:
-        - user (UserReadSerializer): Read-only user information linked to the delivery person.
-
-    Fields:
-        - user (dict): User details (e.g., full name, email, user type).
-        - availability (str): Current availability status of the delivery person.
-        - vehicle (str): Type or model of the delivery vehicle.
-        - license_plate (str): License plate of the delivery vehicle.
-        - url (str): URL to the detailed delivery person endpoint.
-
-    Read-only fields:
-        - availability
-        - vehicle
-        - license_plate
-
-    Additional configuration:
-        - The "url" field uses "api:deliveryperson-detail" with the primary key as lookup.
-    """
-
-    user = UserReadSerializer()
-
-    class Meta:
-        model = DeliveryPerson
-        fields = [
-            "user",
-            "availability",
-            "vehicle",
-            "license_plate",
-            "url",
-        ]
-        read_only_fields = fields
-        extra_kwargs = {
-            "url": {"view_name": "api:deliveryperson-detail", "lookup_field": "pk"},
-        }
-
-
-class DeliveryPersonCreatedSerializer(serializers.ModelSerializer[DeliveryPerson]):
-    class Meta:
-        model = DeliveryPerson
-        fields = ["user", "availability", "vehicle", "license_plate"]
-
-    def create(self, validated_data):
-        return super().create(validated_data)
-
-
-class DeliveryPersonUpdateSerializer(serializers.ModelSerializer[DeliveryPerson]):
-    class Meta:
-        model = DeliveryPerson
-        fields = ["user", "availability", "vehicle", "license_plate"]
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
 
 
 class ReadOnlyComplementaryOrderSerializer(serializers.ModelSerializer):
@@ -305,7 +166,7 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
         - The "url" field uses the view name "api:order-detail" and looks up by primary key.
     """
 
-    delivery_person_full_name = serializers.CharField(source="delivery_person.user.full_name", read_only=True)
+    delivery_person_full_name = serializers.CharField(source="delivery_person.user.name", read_only=True)
     establishment = serializers.CharField(source="establishment.name", read_only=True)
 
     full_delivery_address = serializers.SerializerMethodField()
@@ -612,7 +473,7 @@ class ReadEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
 
     class Meta:
         model = Establishment
-        fields = ["name", "cnpj", "email", "password", "active", "address"]
+        fields = ["id", "name", "cnpj", "email", "active", "address"]
         read_only_fields = fields
         extra_kwargs = {
             "url": {"view_name": "api:establishment-detail", "lookup_field": "pk"},
@@ -621,10 +482,12 @@ class ReadEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
 
 class CreatedEstablishmentSerializer(serializers.ModelSerializer):
     address = CreatedAddressSerializer()
+    active = serializers.HiddenField(default=True)
+    administrator = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Establishment
-        fields = ["name", "cnpj", "email", "password", "active", "address"]
+        fields = ["name", "cnpj", "email", "active", "address", "administrator", "phone"]
 
     def create(self, validated_data):
         address_data = validated_data.pop("address")
@@ -638,7 +501,8 @@ class CreatedEstablishmentSerializer(serializers.ModelSerializer):
 
 class UpdateEstablishmentSerializer(serializers.ModelSerializer[Establishment]):
     class Meta:
-        fields = ["name", "email", "password", "active", "address"]
+        model = Establishment
+        fields = ["name", "email", "active", "address"]
         read_only_fields = ["cnpj"]
 
     def update(self, instance, validated_data):

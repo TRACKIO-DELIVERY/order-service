@@ -14,7 +14,7 @@ def generate_backup_postgres():
     comando = [
         "docker",
         "exec",
-        "order_service_local_postgres",
+        "order_service_postgres",
         "pg_dump",
         "-U",
         "PjuHeKcBPyqGCsZHUouCBBTuySoOnWfT",
@@ -26,4 +26,4 @@ def generate_backup_postgres():
             subprocess.run(comando, check=True, stdout=f)  # noqa: S603
         logging.info(f"[BACKUP OK] Backup salvo em {backup_path}")
     except subprocess.CalledProcessError as e:
-        logging.info(f"[BACKUP ERRO] {e.stderr}")
+        logging.exception(f"[BACKUP ERRO] {e.stderr}")

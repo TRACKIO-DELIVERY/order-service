@@ -134,6 +134,8 @@ ignore = [
   "TRY003",
   "TRY300",
   "EM101",
+  "FBT002",
+  "BLE001", #blind exceptions
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.
