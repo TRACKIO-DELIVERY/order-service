@@ -178,6 +178,7 @@ class OrderReadSerializer(serializers.ModelSerializer[Order]):
             "id",
             "establishment",
             "email",
+            "url",
             "delivery_person_full_name",
             "full_delivery_address",
             "full_pickup_address",
@@ -247,6 +248,7 @@ class OrderCreatedSerializer(serializers.ModelSerializer[Order]):
         fields = [
             "establishment",
             "email",
+            "url",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -282,6 +284,7 @@ class OrderUpdateSerializer(serializers.ModelSerializer[Order]):
         fields = [
             "establishment",
             "email",
+            "url",
             "delivery_person",
             "delivery_fee",
             "order_value",
@@ -313,7 +316,6 @@ class OrderTrackingReadSerializer(serializers.ModelSerializer[OrderTracking]):
 
     Notes:
         - All fields are read-only.
-        - The "url" field uses the view name "api:ordertracking-detail" and looks up by primary key.
     """
 
     start_latitude = serializers.FloatField(read_only=True)
@@ -331,10 +333,8 @@ class OrderTrackingReadSerializer(serializers.ModelSerializer[OrderTracking]):
             "end_latitude",
             "end_longitude",
             "timestamp",
-            "url",
         ]
         read_only_fields = fields
-        extra_kwargs = {"url": {"view_name": "api:ordertracking-detail", "lookup_field": "pk"}}
 
 
 class OrderTrackingCreatedSerializer(serializers.ModelSerializer[OrderTracking]):
@@ -444,6 +444,41 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
         ComplementaryOrder.objects.create(order=order, **complementary_data)
 
         return order
+
+
+class CreateDeliveryPersonAlignedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ComplementaryOrder model.
+    Captures delivery and pickup address details.
+    """
+
+    class Meta:
+        model = DeliveryPerson
+        fields = [ 
+            "availability", 
+            "vehicle", 
+            "license_plate"
+        ]
+class CreateUserAlignedSerializer(serializers.ModelSerializer):
+    delivery_person = CreateDeliveryPersonAlignedSerializer(source="deliveryperson")
+
+    class Meta:
+        model = User
+        fields = [
+            "full_name", 
+            "email", 
+            "birth_date", 
+            "is_active", 
+            "user_type", 
+            "cpf",
+            "delivery_person", 
+        ]
+
+    def create(self, validated_data):
+        delivery_data = validated_data.pop("deliveryperson")
+        user = User.objects.create(**validated_data)
+        DeliveryPerson.objects.create(user=user, **delivery_data)
+        return user
 
 
 class ReadAddressSerializer(serializers.ModelSerializer[Address]):

@@ -70,9 +70,21 @@ INSTALLED_APPS += ["django_extensions"]
 CELERY_TASK_EAGER_PROPAGATES = True
 
 CELERY_BEAT_SCHEDULE = {
-    "backup_postgres_diario": {
+    "backup_postgres_diario_teste": {
         "task": "order_service.core.tasks.generate_backup_postgres",
-        "schedule": crontab(hour=2, minute=0),
+        "schedule": crontab(hour=2,minute=0),
         # utilizar 5 minutos para testes minute='*/5'
+    },
+    "consumir_fila": {
+        "task": "order_service.core.tasks.consumer_order_delivered",
+        "schedule": crontab(minute="*/1"),
+    },
+    "consumir_fila_in_rout":{
+        "task": "order_service.core.tasks.consumer_order_in_route",
+        "schedule": crontab(minute="*/1"),
+    },
+    "consumir_fila_accepted":{
+        "task": "order_service.core.tasks.consumer_order_accepted",
+        "schedule": crontab(minute="*/1"),
     },
 }

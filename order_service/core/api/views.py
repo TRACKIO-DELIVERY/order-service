@@ -26,6 +26,7 @@ from .serializers import ReadEstablishmentSerializer
 from .serializers import ReadOnlyComplementaryOrderSerializer
 from .serializers import UpdateComplementaryOrderSerializer
 from .serializers import UpdateEstablishmentSerializer
+from .serializers import CreateUserAlignedSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -64,6 +65,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return OrderUpdateSerializer
         return OrderReadSerializer
+    
 
 
 class OrderTrackingViewSet(viewsets.ModelViewSet):
@@ -97,7 +99,6 @@ class OrderTrackingViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return OrderTrackingUpdateSerializer
         return OrderTrackingReadSerializer
-
 
 class ComplementaryOrderViewSet(viewsets.ModelViewSet):
     """
@@ -153,17 +154,23 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
         order = serializer.save()
 
         order_tracking_service.create_tracking_for_order(order)
+        tracking = order.tracking_order
 
         read_data = OrderReadSerializer(order).data
-
+        read_data2 = OrderTrackingReadSerializer(tracking).data
+        
         payload = {
             "order_id": read_data.get("id"),
             "email": read_data.get("email") or None,
             "status": read_data.get("order_status") or None,
             "delivery_person_full_name": read_data.get("delivery_person_full_name") or None,
             "delivery_fee": read_data.get("delivery_fee") or None,
-            "full_delivery_address": read_data.get("full_delivery_address") or None,
-            "full_pickup_address": read_data.get("full_pickup_address") or None,
+            "full_delivery_address": read_data.get("full_delivery_address"),
+            "full_pickup_address": read_data.get("full_pickup_address"),
+            "start_latitude": read_data2.get("start_latitude"),
+            "start_longitude": read_data2.get("start_longitude"),
+            "end_latitude": read_data2.get("end_latitude"),
+            "end_longitude": read_data2.get("end_longitude")
         }
 
         try:
@@ -188,3 +195,7 @@ class EstablishmentViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return UpdateEstablishmentSerializer
         return ReadEstablishmentSerializer
+
+class UserAlignedViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = CreateUserAlignedSerializer
