@@ -341,7 +341,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 # ------------------------------------------------------------------------------
 
 SIMPLE_JWT = {
-    "TOKEN_OBTAIN_SERIALIZER": "order_service.auth.api.serializers.CustomTokenObtainPairSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "order_service.authentication.api.serializers.CustomTokenObtainPairSerializer",
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,

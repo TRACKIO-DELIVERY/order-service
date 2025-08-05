@@ -36,13 +36,10 @@ class Google:
         :param device_type: The type of device (android, ios, or site).
         """
         try:
-            # Validate the device type
             Google._validate_device_type(device_type)
 
-            # Fetch the client ID for the device type
             client_id = CLIENT_ID_PER_DEVICE[device_type]
 
-            # Verify the OAuth2 token
             return id_token.verify_oauth2_token(auth_token, google_request.Request(), client_id, 200)
 
         except ValueError as exc:
