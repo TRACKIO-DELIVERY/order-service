@@ -87,4 +87,3 @@ def consumer_order_accepted():
         logging.info("Pedido processado com sucesso.")
     else:
         logging.warning("Erro ao processar o pedido.")
-        logging.exception(f"[BACKUP ERRO] {e.stderr}")

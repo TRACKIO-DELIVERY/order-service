@@ -26,7 +26,6 @@ from .serializers import ReadEstablishmentSerializer
 from .serializers import ReadOnlyComplementaryOrderSerializer
 from .serializers import UpdateComplementaryOrderSerializer
 from .serializers import UpdateEstablishmentSerializer
-from .serializers import CreateUserAlignedSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -196,6 +195,3 @@ class EstablishmentViewSet(viewsets.ModelViewSet):
             return UpdateEstablishmentSerializer
         return ReadEstablishmentSerializer
 
-class UserAlignedViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = CreateUserAlignedSerializer

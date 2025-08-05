@@ -69,6 +69,10 @@ INSTALLED_APPS += ["django_extensions"]
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
 
+SPECTACULAR_SETTINGS["SERVERS"] = [
+    {"url": "http://localhost:8000", "description": "Local development server"},
+]
+
 CELERY_BEAT_SCHEDULE = {
     "backup_postgres_diario_teste": {
         "task": "order_service.core.tasks.generate_backup_postgres",

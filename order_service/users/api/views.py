@@ -115,6 +115,8 @@ class DeliveryPersonViewSet(viewsets.ModelViewSet):
         - DELETE /api/delivery-people/{id}/      → Delete a delivery person
     """
 
+    permission_classes = [permissions.AllowAny]
+
     queryset = DeliveryPerson.objects.all().select_related("user")
     serializer_class = DeliveryPersonReadSerializer
 
@@ -136,3 +138,4 @@ class DeliveryPersonViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return DeliveryPersonUpdateSerializer
         return DeliveryPersonReadSerializer
+

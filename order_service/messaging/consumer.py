@@ -5,7 +5,8 @@ import aio_pika
 from aio_pika.exceptions import QueueEmpty
 from asgiref.sync import sync_to_async
 import json
-from order_service.core.api.serializers import OrderUpdateSerializer,Order,DeliveryPerson
+from order_service.core.api.serializers import OrderUpdateSerializer,Order
+from order_service.users.models import DeliveryPerson
 #from callbacks import on_message
 from order_service.messaging.connection import get_connection
 
