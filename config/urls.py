@@ -13,7 +13,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.views import TokenVerifyView
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("home/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
         "about/",
         TemplateView.as_view(template_name="pages/about.html"),
@@ -24,6 +24,8 @@ urlpatterns = [
     # User management
     path("users/", include("order_service.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
+    # Django Prometheus
+    path("", include("django_prometheus.urls")),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
@@ -32,6 +34,7 @@ urlpatterns = [
 urlpatterns += [
     # API base url
     path("api/", include("config.api_router")),
+    path("api/auth/social/", include("order_service.authentication.api.social.urls")),
     # DRF auth token
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

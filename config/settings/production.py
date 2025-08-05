@@ -174,7 +174,7 @@ LOGGING = {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
         "json": {
-            "format": '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "name": "%(name)s", "message": "%(message)s", "module": "%(module)s", "process": %(process)d, "thread": %(thread)d}',
+            "format": '{"service" : "order_service_django", "timestamp": "%(asctime)s", "level": "%(levelname)s", "name": "%(name)s", "message": "%(message)s", "module": "%(module)s", "process": %(process)d, "thread": %(thread)d}',
         },
     },
     "handlers": {

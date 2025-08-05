@@ -32,7 +32,7 @@ class User(AbstractUser):
 
     user_type = models.CharField(_("User type"), max_length=10, choices=UserType, default=UserType.CUSTOMER)
 
-    objects = querysets.UserManagerCustom()
+    objects: querysets.UserManagerCustom = querysets.UserManagerCustom()
     filtered_objects = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"

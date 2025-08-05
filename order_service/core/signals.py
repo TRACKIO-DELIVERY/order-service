@@ -1,16 +1,9 @@
-import logging
 from django.db import connection
 from django.db.models.signals import post_migrate
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from order_service.messaging.producer import producer
-
-from .models import Order
-
-
-#OrderReadSerializer(instance)
-#OrderReadSerializer(data=instance).data
+# OrderReadSerializer(instance)
+# OrderReadSerializer(data=instance).data
 
 
 # @receiver(post_save, sender=Order)
@@ -31,7 +24,8 @@ from .models import Order
 #        logging.exception(
 #            f"Error sending message to broker. Exception: {type(exc).__name__} Message: {exc}"
 #        )
-        
+
+
 @receiver(post_migrate)
 def create_audit_trigger(sender, **kwargs):
     with connection.cursor() as cursor:

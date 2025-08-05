@@ -20,6 +20,5 @@ router.register(r"complementary-order", ComplementaryOrderViewSet)
 router.register(r"aligned-order", OrderAlignedViewSet, basename="aligned-order")
 router.register(r"establishment", EstablishmentViewSet)
 
-
 app_name = "api"
 urlpatterns = router.urls

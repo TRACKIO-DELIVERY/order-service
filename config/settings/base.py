@@ -90,12 +90,13 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "drf_spectacular",
     "rest_framework_simplejwt.token_blacklist",
+    "django_prometheus",
 ]
 
 LOCAL_APPS = [
     "order_service.users",
     "order_service.core",
-    # Your stuff: custom apps go here
+    "order_service.authentication",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -144,6 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -154,6 +156,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 # STATIC
@@ -334,29 +337,11 @@ SOCIALACCOUNT_FORMS = {"signup": "order_service.users.forms.UserSocialSignupForm
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "FETCH_USERINFO": True,
-        "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
-        "OAUTH_PKCE_ENABLED": True,
-        "EMAIL_AUTHENTICATION": True,
-        "APPS": [
-            {
-                "client_id": env("GOOGLE_CLIENT_ID", default="client_id_here"),
-                "secret": env("GOOGLE_SECRET_KEY", default="client_secret_here"),
-                "key": "",
-                "name": "google",
-            }
-        ],
-    }
-}
-
 # simplejwt-authentication
 # ------------------------------------------------------------------------------
 
 SIMPLE_JWT = {
-    "TOKEN_OBTAIN_SERIALIZER": "order_service.users.api.serializers.CustomTokenObtainPairSerializer",
+    "TOKEN_OBTAIN_SERIALIZER": "order_service.authentication.api.serializers.CustomTokenObtainPairSerializer",
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
