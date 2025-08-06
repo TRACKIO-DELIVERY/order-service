@@ -38,7 +38,7 @@ class User(AbstractUser):
     user_type = models.CharField(_("User type"), max_length=10, choices=UserType, default=UserType.CUSTOMER)
 
     objects: querysets.UserManagerCustom = querysets.UserManagerCustom()
-    filtered_objects = querysets.UserQuerySet.as_manager()
+    filtered_objects: querysets.UserQuerySet = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]

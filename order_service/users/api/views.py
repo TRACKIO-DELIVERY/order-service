@@ -73,13 +73,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        is_active = self.request.query_params.get("is_active", "true").lower() == "true"
+        is_active = self.request.GET.get("is_active", "true").lower() == "true"
         if is_active:
             queryset = queryset.filtered_objects.active()
         else:
             queryset = queryset.filtered_objects.inactive()
 
-        user_type = self.request.query_params.get("user_type", None)
+        user_type = self.request.GET.get("user_type", None)
         if user_type is not None:
             if user_type == "Customer":
                 queryset = queryset.filtered_objects.customers()
