@@ -10,15 +10,16 @@ from order_service.authentication.services.google import Google
 
 
 class GoogleSocialAuthSerializer(serializers.Serializer):
-    auth_token = serializers.CharField()
-    device_type = serializers.CharField(default="mobile")
+    auth_token = serializers.CharField(write_only=True)
+    device_type = serializers.CharField(write_only=True, default="mobile")
 
     def validate(self, attrs) -> dict | None:
         from order_service.users.models import User
 
+        attrs = super().validate(attrs)
         try:
-            auth_token = attrs["auth_token"]
-            device_type = attrs["device_type"]
+            auth_token = attrs.get("auth_token")
+            device_type = attrs.get("device_type")
 
             user_data = Google.validate(auth_token, device_type=device_type)
 

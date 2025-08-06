@@ -43,3 +43,6 @@ class GoogleAuthView(APIView):
         except ValidationError as exc:
             logging.exception(f"Google Authentication failed. Message: {exc}")
             return Response({"error": "Authentication Failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as exc:
+            logging.exception(f"An unexpected error occurred during Google authentication. Message: {exc}")
+            return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
