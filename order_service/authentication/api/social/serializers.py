@@ -12,6 +12,13 @@ from order_service.authentication.services.google import Google
 class GoogleSocialAuthSerializer(serializers.Serializer):
     auth_token = serializers.CharField(write_only=True)
     device_type = serializers.CharField(write_only=True, default="mobile")
+    user_type = serializers.IntegerField(write_only=True, default=3)
+
+    def to_representation(self, instance):
+        return {
+            "refresh": instance.get("refresh"),
+            "access": instance.get("access"),
+        }
 
     def validate(self, attrs) -> dict | None:
         from order_service.users.models import User
@@ -20,6 +27,10 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         try:
             auth_token = attrs.get("auth_token")
             device_type = attrs.get("device_type")
+            user_type = attrs.get("user_type", 3)
+
+            if not auth_token:
+                raise SocialAuthException("Authentication token is required")
 
             user_data = Google.validate(auth_token, device_type=device_type)
 
@@ -30,6 +41,7 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
             user = {
                 "name": user_data["name"],
                 "email": user_data["email"],
+                "user_type": user_type,
                 "uid": user_data["sub"],
                 "provider": "google",
             }
