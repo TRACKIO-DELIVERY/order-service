@@ -73,7 +73,6 @@ class UserManagerCustom(UserManager.from_queryset(UserQuerySet)):
 
         social_user, _ = SocialAccount.objects.update_or_create(
             user=user,
-            name=name,
             provider=extra_fields.get("provider", "google"),
             uid=extra_fields.get("uid"),
         )
