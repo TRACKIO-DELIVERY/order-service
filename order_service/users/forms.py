@@ -43,7 +43,7 @@ class UserSignupForm(SignupForm):
         required=True,
         label=_("Name"),
         max_length=255,
-        widget=forms.TextInput(attrs={"placeholder": "Nome Completo"}),
+        widget=forms.TextInput(attrs={"placeholder": _("Full Name")}),
     )
     birth_date = forms.DateField(
         required=False,
@@ -89,11 +89,11 @@ class UserSignupForm(SignupForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["name"].label = "Nome Completo"
-        self.fields["birth_date"].label = "Data de Nascimento"
+        self.fields["name"].label = _("Full name")
+        self.fields["birth_date"].label = _("Birth date")
         self.fields["cpf"].label = "CPF"
         self.fields["email"].label = "E-mail"
-        self.fields["username"].label = "Nome de Usuário"
+        self.fields["username"].label = _("Username")
 
 
 class UserSocialSignupForm(SocialSignupForm):

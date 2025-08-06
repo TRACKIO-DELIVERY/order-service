@@ -140,6 +140,7 @@ ignore = [
   "ERA001",
   "C901",
   "PLR0915",
+  "SIM108",
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.
