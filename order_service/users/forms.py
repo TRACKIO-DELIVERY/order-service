@@ -5,7 +5,6 @@ from django.contrib.auth import forms as admin_forms
 from django.utils.translation import gettext_lazy as _
 
 from .models import User
-from .querysets import get_username_not_used
 
 
 class UserAdminChangeForm(admin_forms.UserChangeForm):
@@ -65,7 +64,7 @@ class UserSignupForm(SignupForm):
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
-        return get_username_not_used(username)
+        return User.get_username_not_used(username)
 
     def clean(self):
         cleaned_data = super().clean()

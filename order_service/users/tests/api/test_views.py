@@ -20,7 +20,7 @@ class TestUserViewSet:
         assert user in view.get_queryset()
 
     def test_me(self, user: User, api_rf: APIRequestFactory):
-        view = UserViewSet()
+        view = UserViewSet.as_view({"get": "me"})
         request = api_rf.get("/fake-url/")
         request.user = user
 
