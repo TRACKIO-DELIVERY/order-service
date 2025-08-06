@@ -75,18 +75,18 @@ class UserViewSet(viewsets.ModelViewSet):
 
         is_active = self.request.GET.get("is_active", "true").lower() == "true"
         if is_active:
-            queryset = queryset.filtered_objects.active()
+            queryset = queryset.active()
         else:
-            queryset = queryset.filtered_objects.inactive()
+            queryset = queryset.inactive()
 
         user_type = self.request.GET.get("user_type", None)
         if user_type is not None:
             if user_type == "Customer":
-                queryset = queryset.filtered_objects.customers()
+                queryset = queryset.customers()
             elif user_type == "Administrator":
-                queryset = queryset.filtered_objects.administrator()
+                queryset = queryset.administrator()
             elif user_type == "Delivery Man":
-                queryset = queryset.filtered_objects.delivery_man()
+                queryset = queryset.delivery_man()
 
         return queryset
 
