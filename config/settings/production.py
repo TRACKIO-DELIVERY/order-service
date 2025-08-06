@@ -130,20 +130,21 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = EMAIL_SUBJECT_PREFIX
 
 
 EMAIL_HOST = env(
-    "DJANGO_EMAIL_HOST",
+    "EMAIL_HOST",
     default="smtp.gmail.com",
 )
-EMAIL_PORT = env.int("DJANGO_EMAIL_PORT", default=465)
+EMAIL_PORT = env.int("EMAIL_PORT", default=465)
+
 EMAIL_HOST_USER = env(
-    "DJANGO_EMAIL_HOST_USER",
+    "EMAIL_HOST_USER",
     default="trackio.system@gmail.com",
 )
 EMAIL_HOST_PASSWORD = env(
-    "DJANGO_EMAIL_HOST_PASSWORD",
+    "EMAIL_HOST_PASSWORD",
     default="",
 )
 EMAIL_USE_SSL = env.bool(
-    "DJANGO_EMAIL_USE_SSL",
+    "EMAIL_USE_SSL",
     default=True,
 )
 
@@ -218,15 +219,16 @@ CELERY_BEAT_SCHEDULE = {
     "backup_postgres_diario": {
         "task": "order_service.core.tasks.generate_backup_postgres",
         "schedule": crontab(hour=2, minute=0),
-    },"consumir_fila": {
+    },
+    "consumir_fila": {
         "task": "order_service.core.tasks.consumer_order_delivered",
         "schedule": crontab(minute="*/1"),
     },
-    "consumir_fila_in_rout":{
+    "consumir_fila_in_rout": {
         "task": "order_service.core.tasks.consumer_order_in_route",
         "schedule": crontab(minute="*/1"),
     },
-    "consumir_fila_accepted":{
+    "consumir_fila_accepted": {
         "task": "order_service.core.tasks.consumer_order_accepted",
         "schedule": crontab(minute="*/1"),
     },
