@@ -1,11 +1,15 @@
+import asyncio
 import datetime
 import logging
 import subprocess
+from pathlib import Path
 
 from celery import shared_task
-from order_service.messaging.consumer import consumer_delivered,consumer_in_route,consumer_accepted
 
-import asyncio
+from order_service.messaging.consumer import consumer_accepted
+from order_service.messaging.consumer import consumer_delivered
+from order_service.messaging.consumer import consumer_in_route
+
 
 @shared_task
 def generate_backup_postgres():
@@ -20,7 +24,7 @@ def generate_backup_postgres():
     Raises:
     subprocess.CalledProcessError: If the `pg_dump` command fails.
     """
-    data = datetime.datetime.now().strftime("%Y%m%d_%H%M%S") 
+    data = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d_%H%M%S")
     backup_filename = f"backup_{data}.sql"
     backup_path = f"/backups/{backup_filename}"
 
@@ -35,8 +39,8 @@ def generate_backup_postgres():
     ]
 
     try:
-        with open(backup_path, "w") as f: 
-            subprocess.run(comando, check=True, stdout=f) 
+        with Path.open(backup_path, "w") as f:
+            subprocess.run(comando, check=True, stdout=f)  # noqa: S603
         logging.info(f"[BACKUP OK] Backup salvo em {backup_path}")
     except subprocess.CalledProcessError as e:
         logging.info(f"[BACKUP ERRO] {e.stderr}")
@@ -56,6 +60,7 @@ def consumer_order_delivered():
         logging.info("Pedido processado com sucesso.")
     else:
         logging.warning("Erro ao processar o pedido.")
+
 
 @shared_task
 def consumer_order_in_route():

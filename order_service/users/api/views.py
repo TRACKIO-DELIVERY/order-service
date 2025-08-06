@@ -138,4 +138,3 @@ class DeliveryPersonViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return DeliveryPersonUpdateSerializer
         return DeliveryPersonReadSerializer
-

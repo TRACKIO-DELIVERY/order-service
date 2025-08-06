@@ -445,6 +445,7 @@ class CreateOrderAlignedSerializer(serializers.ModelSerializer):
 
         return order
 
+
 class ReadAddressSerializer(serializers.ModelSerializer[Address]):
     class Meta:
         model = Address

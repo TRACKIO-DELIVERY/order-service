@@ -66,7 +66,7 @@ class Order(TimeStampedModel):
     establishment = models.ForeignKey(Establishment, on_delete=models.CASCADE)
     email = models.CharField(max_length=100)
     delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.SET_NULL, null=True)
-    url = models.CharField(max_length=100,blank=True)
+    url = models.CharField(max_length=100, blank=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
     order_value = models.DecimalField(max_digits=10, decimal_places=2)
     closing_date = models.DateTimeField(null=True, blank=True)

@@ -3,9 +3,8 @@ from django.contrib import admin
 from .models import ComplementaryOrder
 from .models import DeliveryPerson
 from .models import Order
-from .models import OrderTracking
-from .models import User
 from .models import OrderLog
+from .models import OrderTracking
 from .models import UserLog
 
 # Register your models here.
