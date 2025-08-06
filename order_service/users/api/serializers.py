@@ -168,4 +168,3 @@ class DeliveryPersonUpdateSerializer(serializers.ModelSerializer[DeliveryPerson]
 
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
-

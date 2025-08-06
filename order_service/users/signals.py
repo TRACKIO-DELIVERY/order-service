@@ -1,4 +1,5 @@
 import logging
+
 from django.db import connection
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -59,3 +60,4 @@ def create_audit_trigger(sender, **kwargs):
         END
         $$;
         """)
+        logging.info("Audit trigger created for users_user table.")

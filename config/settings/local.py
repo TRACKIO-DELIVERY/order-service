@@ -4,6 +4,7 @@ from celery.schedules import crontab
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
+from .base import SPECTACULAR_SETTINGS
 from .base import env
 
 # GENERAL
@@ -76,18 +77,18 @@ SPECTACULAR_SETTINGS["SERVERS"] = [
 CELERY_BEAT_SCHEDULE = {
     "backup_postgres_diario_teste": {
         "task": "order_service.core.tasks.generate_backup_postgres",
-        "schedule": crontab(hour=2,minute=0),
+        "schedule": crontab(hour=2, minute=0),
         # utilizar 5 minutos para testes minute='*/5'
     },
     "consumir_fila": {
         "task": "order_service.core.tasks.consumer_order_delivered",
         "schedule": crontab(minute="*/1"),
     },
-    "consumir_fila_in_rout":{
+    "consumir_fila_in_rout": {
         "task": "order_service.core.tasks.consumer_order_in_route",
         "schedule": crontab(minute="*/1"),
     },
-    "consumir_fila_accepted":{
+    "consumir_fila_accepted": {
         "task": "order_service.core.tasks.consumer_order_accepted",
         "schedule": crontab(minute="*/1"),
     },

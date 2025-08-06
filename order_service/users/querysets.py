@@ -1,29 +1,8 @@
-import logging
-import random
-import string
-
 from allauth.socialaccount.models import SocialAccount
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import UserManager
 from django.db.models import QuerySet
 
 from config.settings.base import env
-
-
-def get_username_not_used(username):
-    """
-    Generate a unique username by appending a random suffix if the provided username is already taken.
-    :param username: The base username to check.
-    :return: A unique username.
-    """
-    auth_user_model = get_user_model()
-    while auth_user_model.objects.filter(username=username).exists():
-        logging.warning(f"Username '{username}' is already taken. Generating a new one.")
-        base = username
-        suffix = "".join(random.choices(string.digits, k=4))  # noqa: S311
-        username = f"{base}{suffix}"
-
-    return username
 
 
 class UserManagerCustom(UserManager):
@@ -38,7 +17,7 @@ class UserManagerCustom(UserManager):
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         username = extra_fields.get("username") if extra_fields.get("username") != "" else email.split("@")[0]
-        user.username = get_username_not_used(username)
+        user.username = self.model.get_username_not_used(username)
 
         user.validate_unique()
 
@@ -67,7 +46,7 @@ class UserManagerCustom(UserManager):
         if not user:
             user = self.model(name=name, email=email, cpf=None)
             username = extra_fields.get("username") if extra_fields.get("username") != "" else email.split("@")[0]
-            user.username = get_username_not_used(username)
+            user.username = self.model.get_username_not_used(username)
             user.set_password(env("SOCIAL_PASSWORD_SECRET"))
             user.validate_unique()
             user.save(using=self._db)

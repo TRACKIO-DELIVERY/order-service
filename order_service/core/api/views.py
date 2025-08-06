@@ -64,7 +64,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return OrderUpdateSerializer
         return OrderReadSerializer
-    
 
 
 class OrderTrackingViewSet(viewsets.ModelViewSet):
@@ -98,6 +97,7 @@ class OrderTrackingViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return OrderTrackingUpdateSerializer
         return OrderTrackingReadSerializer
+
 
 class ComplementaryOrderViewSet(viewsets.ModelViewSet):
     """
@@ -157,7 +157,7 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
 
         read_data = OrderReadSerializer(order).data
         read_data2 = OrderTrackingReadSerializer(tracking).data
-        
+
         payload = {
             "order_id": read_data.get("id"),
             "email": read_data.get("email") or None,
@@ -169,7 +169,7 @@ class OrderAlignedViewSet(viewsets.ModelViewSet):
             "start_latitude": read_data2.get("start_latitude"),
             "start_longitude": read_data2.get("start_longitude"),
             "end_latitude": read_data2.get("end_latitude"),
-            "end_longitude": read_data2.get("end_longitude")
+            "end_longitude": read_data2.get("end_longitude"),
         }
 
         try:
@@ -194,4 +194,3 @@ class EstablishmentViewSet(viewsets.ModelViewSet):
         if self.action in ["update", "partial_update"]:
             return UpdateEstablishmentSerializer
         return ReadEstablishmentSerializer
-

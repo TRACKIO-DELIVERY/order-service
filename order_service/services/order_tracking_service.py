@@ -31,7 +31,7 @@ def create_tracking_for_order(order):
         comp_order = ComplementaryOrder.objects.get(order=order)
 
         address = order.establishment.address
-        
+
         pickup_address = (
             f"{address.street}, {address.number}, "
             f"{address.neighborhood}, {address.city}, "

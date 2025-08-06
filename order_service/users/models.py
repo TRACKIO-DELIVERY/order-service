@@ -1,3 +1,7 @@
+import logging
+import random
+import string
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -34,13 +38,34 @@ class User(AbstractUser):
     user_type = models.CharField(_("User type"), max_length=10, choices=UserType, default=UserType.CUSTOMER)
 
     objects: querysets.UserManagerCustom = querysets.UserManagerCustom()
-    filtered_objects = querysets.UserQuerySet.as_manager()
+    filtered_objects: querysets.UserQuerySet = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "username"]
+    REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
         return f"{self.name} ({self.user_type})"
+
+    @staticmethod
+    def get_username_not_used(username):
+        """
+        Generate a unique username by appending a random suffix if the provided username is already taken.
+        :param username: The base username to check.
+        :return: A unique username.
+        """
+
+        while User.objects.filter(username=username).exists():
+            logging.warning(f"Username '{username}' is already taken. Generating a new one.")
+            base = username
+            suffix = "".join(random.choices(string.digits, k=4))  # noqa: S311
+            username = f"{base}{suffix}"
+        return username
+
+    def save(self, *args, **kwargs) -> None:
+        if self.username in [None, "", " "]:
+            self.username = self.get_username_not_used(self.email.split("@")[0])
+
+        return super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.
