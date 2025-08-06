@@ -1,5 +1,7 @@
 import logging
 
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import extend_schema
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
@@ -19,9 +21,20 @@ class GoogleAuthView(APIView):
     the authentication data.
     """
 
+    @extend_schema(
+        operation_id="Google Social Authentication",
+        request=GoogleSocialAuthSerializer,
+        responses={
+            200: OpenApiResponse(response={"refresh": "str", "access": "str"}),
+            500: OpenApiResponse(description="Internal Server Error"),
+        },
+        tags=["Social Authentication"],
+    )
     def post(self, request, *args, **kwargs):
         """
         Initiates Google authentication process.
+        Expects the request data to contain the device type that generated the Google ID token.
+        Returns a response with the validated data or an error message.
         """
         serializer = self.serializer_class(data=request.data)
         try:

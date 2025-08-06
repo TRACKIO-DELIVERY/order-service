@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Confirmação de Pedido</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f7;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 6px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .header {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .content {
+        margin-top: 15px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .button {
+        margin-top: 25px;
+        display: inline-block;
+        background-color: #28a745;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Olá!</div>
+      <div class="content">
+        Obrigada por realizar seu pedido com <strong>{{ establishment }}</strong>!
+        <br />
+        Seu pedido logo sairá para entrega.
+        <br />
+        Assim que estiver a caminho, enviaremos aqui o link de rastreamento.
+      </div>
+      <div class="footer">
+        Caso tenha alguma dúvida, entre em contato com a equipe do estabelecimento.
+        Através de <a href="{{ establishment_email }}">{{ establishment }}</a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -16,7 +16,6 @@ def get_username_not_used(username):
     :param username: The base username to check.
     :return: A unique username.
     """
-
     auth_user_model = get_user_model()
     while auth_user_model.objects.filter(username=username).exists():
         logging.warning(f"Username '{username}' is already taken. Generating a new one.")
@@ -46,13 +45,27 @@ class UserManagerCustom(UserManager):
         user.save(using=self._db)
         return user
 
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Create and return a `User` with superuser (admin) permissions.
+        """
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(email, password, cpf=None, **extra_fields)
+
     def get_or_create_social_user(self, name, email, **extra_fields):
         """
         Get or create and return a SocialAccount User
         """
         user = self.filter(email__iexact=email).first()
         if not user:
-            user = self.model(name=name, email=email)
+            user = self.model(name=name, email=email, cpf=None)
             username = extra_fields.get("username") if extra_fields.get("username") != "" else email.split("@")[0]
             user.username = get_username_not_used(username)
             user.set_password(env("SOCIAL_PASSWORD_SECRET"))

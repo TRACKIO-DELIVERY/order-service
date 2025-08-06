@@ -138,6 +138,8 @@ ignore = [
   "BLE001", #blind exceptions
   "TRY301", #abstract raise
   "ERA001",
+  "C901",
+  "PLR0915",
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.

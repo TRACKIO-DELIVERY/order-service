@@ -52,11 +52,11 @@ class UserSignupForm(SignupForm):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     cpf = forms.CharField(
-        required=True,
+        required=False,
         label=_("CPF"),
         max_length=11,
         min_length=11,
-        widget=forms.TextInput(attrs={"placeholder": "12345678901"}),
+        widget=forms.TextInput(attrs={"placeholder": "706.123.456-00"}),
         error_messages={
             "max_length": _("CPF must be 11 digits long."),
             "min_length": _("CPF must be 11 digits long."),
@@ -74,13 +74,16 @@ class UserSignupForm(SignupForm):
         if cpf and not cpf.isdigit():
             raise forms.ValidationError(_("CPF must contain only digits."))
 
-        user = User(
-            name=cleaned_data.get("name"),
-            username=cleaned_data.get("username"),
-            email=cleaned_data.get("email"),
-            cpf=cpf,
-            birth_date=cleaned_data.get("birth_date"),
-        )
+        cpf = None if cpf in {"", " "} else cpf
+
+        cleaned_data = {
+            "name": cleaned_data.get("name"),
+            "username": cleaned_data.get("username"),
+            "email": cleaned_data.get("email"),
+            "cpf": cpf,
+            "birth_date": cleaned_data.get("birth_date"),
+        }
+        user = User(**cleaned_data)
         user.validate_unique()
 
         return cleaned_data

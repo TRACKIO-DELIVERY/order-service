@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pedido a Caminho</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .header {
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .content {
+        margin-top: 15px;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .button {
+        margin-top: 25px;
+        display: inline-block;
+        background-color: #3c2387;
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Seu pedido está a caminho! 🚚</div>
+      <div class="content">
+        Olá! O seu pedido com <strong>{{ establishment }}</strong> já está em rota de entrega.
+        <br />
+        Você pode acompanhar o trajeto do entregador em tempo real clicando no botão abaixo.
+      </div>
+      <a href="{{ tracking_link }}" class="button">Acompanhar Entrega</a>
+      <div class="footer">
+        Agradecemos por escolher {{ establishment }}.
+        <br />
+        Caso tenha alguma dúvida, estamos à disposição.
+      </div>
+    </div>
+  </body>
+</html>

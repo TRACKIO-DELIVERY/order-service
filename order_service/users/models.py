@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -36,7 +37,7 @@ class User(AbstractUser):
     filtered_objects = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name"]
+    REQUIRED_FIELDS = ["name", "username"]
 
     def __str__(self):
         return f"{self.name} ({self.user_type})"
@@ -53,7 +54,7 @@ class User(AbstractUser):
     def validate_unique(self, exclude=None):
         """Validate uniqueness of email and CPF fields."""
         super().validate_unique(exclude=exclude)
-        if User.objects.filter(cpf=self.cpf).exclude(pk=self.pk).exists():
+        if User.objects.filter(Q(cpf=self.cpf) & Q(cpf__isnull=False)).exclude(pk=self.pk).exists():
             raise ValidationError({"cpf": _("CPF must be unique.")})
         if User.objects.filter(email=self.email).exclude(pk=self.pk).exists():
             raise ValidationError({"email": _("Email must be unique.")})

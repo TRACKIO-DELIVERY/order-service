@@ -1,23 +1,23 @@
-from typing import TYPE_CHECKING
-import traceback
+import json
 import logging
-import aio_pika
+import traceback
+
 from aio_pika.exceptions import QueueEmpty
 from asgiref.sync import sync_to_async
-import json
-from order_service.core.api.serializers import OrderUpdateSerializer,Order
-from order_service.users.models import DeliveryPerson
-#from callbacks import on_message
+
+from order_service.core.api.serializers import Order
+from order_service.core.api.serializers import OrderUpdateSerializer
+
+# from callbacks import on_message
 from order_service.messaging.connection import get_connection
-
-if TYPE_CHECKING:
-    import aio_pika.abc
-
+from order_service.services.send_mail_order import send_email_to_order_client
+from order_service.users.models import DeliveryPerson
 
 VALID_TRANSITIONS = {
-    2: [1],    # in_route 
-    3: [2],    # delivered
+    2: [1],  # in_route
+    3: [2],  # delivered
 }
+
 
 def is_valid_transition(current_status, new_status):
     """
@@ -34,6 +34,7 @@ def is_valid_transition(current_status, new_status):
         bool: `True` if the transition is valid, `False` otherwise.
     """
     return current_status in VALID_TRANSITIONS.get(new_status, [])
+
 
 @sync_to_async
 def atualizar_pedido(order, mensagem):
@@ -59,7 +60,6 @@ def atualizar_pedido(order, mensagem):
         serializer.save()
         return True, None
     return False, serializer.errors
-
 
 
 async def consumer_accepted(queue_name: str) -> None:
@@ -114,12 +114,12 @@ async def consumer_accepted(queue_name: str) -> None:
                 except Order.DoesNotExist:
                     logging.warning(f"Pedido com ID {order_id} não encontrado.")
                     continue
-                
+
                 delivery_person_id = mensagem.get("delivery_person")
                 if delivery_person_id in [None, "", 0]:
                     logging.warning("Mensagem recebida com delivery_person inválido.")
                     continue
-                
+
                 try:
                     delivery_person = await sync_to_async(DeliveryPerson.objects.get)(id=delivery_person_id)
                     logging.info(f"Delivery person encontrada: ID {delivery_person.id}")
@@ -132,21 +132,22 @@ async def consumer_accepted(queue_name: str) -> None:
                     logging.warning("Mensagem recebida sem url")
                     continue
 
-
                 try:
                     success, errors = await atualizar_pedido(order, mensagem)
                     if success:
                         logging.info(f"Pedido {order_id} atualizado com sucesso.")
                         await message.ack()
+                        establishment = await sync_to_async(lambda order=order: order.establishment)()
+                        await sync_to_async(send_email_to_order_client)(order.email, establishment, "accepted", url)
                     else:
                         logging.error(f"Erros de validação: {errors}")
                 except Exception as e:
-                    logging.error(f"Erro ao validar/salvar o pedido: {e}")
-                    logging.error(traceback.format_exc())
+                    logging.exception(f"Erro ao validar/salvar o pedido: {e}")
+                    logging.exception(traceback.format_exc())
 
             except Exception as e:
-                logging.error(f"Erro inesperado ao processar mensagem da fila: {e}")
-                logging.error(traceback.format_exc())
+                logging.exception(f"Erro inesperado ao processar mensagem da fila: {e}")
+                logging.exception(traceback.format_exc())
 
 
 async def consumer_in_route(queue_name: str) -> None:
@@ -219,7 +220,7 @@ async def consumer_in_route(queue_name: str) -> None:
                     logging.warning("Pedido sem url ainda")
                     continue
 
-                person = await sync_to_async(lambda: order.delivery_person)()
+                person = await sync_to_async(lambda order=order: order.delivery_person)()
                 if person is None:
                     logging.warning("Pedido sem Entregador")
                     continue
@@ -229,17 +230,18 @@ async def consumer_in_route(queue_name: str) -> None:
                     if success:
                         logging.info(f"Pedido {order_id} atualizado com sucesso.")
                         await message.ack()
+                        establishment = await sync_to_async(lambda order=order: order.establishment)()
+                        await sync_to_async(send_email_to_order_client)(order.email, establishment, "in_route", url)
+
                     else:
                         logging.error(f"Erros de validação: {errors}")
                 except Exception as e:
-                    logging.error(f"Erro ao validar/salvar o pedido: {e}")
-                    logging.error(traceback.format_exc())
-
+                    logging.exception(f"Erro ao validar/salvar o pedido: {e}")
+                    logging.exception(traceback.format_exc())
 
             except Exception as e:
-                logging.error(f"Erro inesperado ao processar mensagem da fila: {e}")
-                logging.error(traceback.format_exc())
-
+                logging.exception(f"Erro inesperado ao processar mensagem da fila: {e}")
+                logging.exception(traceback.format_exc())
 
 
 async def consumer_delivered(queue_name: str) -> None:
@@ -314,10 +316,9 @@ async def consumer_delivered(queue_name: str) -> None:
                     else:
                         logging.error(f"Erros de validação: {errors}")
                 except Exception as e:
-                    logging.error(f"Erro ao validar/salvar o pedido: {e}")
-                    logging.error(traceback.format_exc())
-
+                    logging.exception(f"Erro ao validar/salvar o pedido: {e}")
+                    logging.exception(traceback.format_exc())
 
             except Exception as e:
-                logging.error(f"Erro inesperado ao processar mensagem da fila: {e}")
-                logging.error(traceback.format_exc())
+                logging.exception(f"Erro inesperado ao processar mensagem da fila: {e}")
+                logging.exception(traceback.format_exc())

@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import include
 from django.urls import path
 from django.views import defaults as default_views
+from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularRedocView
@@ -13,6 +14,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.views import TokenVerifyView
 
 urlpatterns = [
+    path("", RedirectView.as_view(pattern_name="home", permanent=False)),
     path("home/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
         "about/",
