@@ -37,7 +37,7 @@ class User(AbstractUser):
     filtered_objects = querysets.UserQuerySet.as_manager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["email", "name"]
+    REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
         return f"{self.name} ({self.user_type})"

@@ -1,3 +1,5 @@
+import contextlib
+
 from django.apps import AppConfig
 
 
@@ -6,4 +8,5 @@ class CoreConfig(AppConfig):
     name = "order_service.core"
 
     def ready(self):
-        pass
+        with contextlib.suppress(ImportError):
+            import order_service.core.signals  # noqa: F401
