@@ -5,7 +5,27 @@ from django.db.models import QuerySet
 from config.settings.base import env
 
 
-class UserManagerCustom(UserManager):
+class UserQuerySet(QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def inactive(self):
+        return self.filter(is_active=False)
+
+    def customers(self):
+        return self.filter(user_type=2)
+
+    def administrator(self):
+        return self.filter(user_type=1)
+
+    def delivery_man(self):
+        return self.filter(user_type=3)
+
+    def order_by_name(self):
+        return self.order_by("name")
+
+
+class UserManagerCustom(UserManager.from_queryset(UserQuerySet)):
     def create_user(self, email, password=None, **extra_fields):
         """
         Create and return a `User` with an email, password and other fields.
@@ -53,7 +73,6 @@ class UserManagerCustom(UserManager):
 
         social_user, _ = SocialAccount.objects.update_or_create(
             user=user,
-            email=email,
             name=name,
             provider=extra_fields.get("provider", "google"),
             uid=extra_fields.get("uid"),
@@ -62,26 +81,6 @@ class UserManagerCustom(UserManager):
 
     def authenticate_social(self, name, email, **extra_fields):
         return self.get_or_create_social_user(name, email, **extra_fields).user
-
-
-class UserQuerySet(QuerySet):
-    def active(self):
-        return self.filter(is_active=True)
-
-    def inactive(self):
-        return self.filter(is_active=False)
-
-    def customers(self):
-        return self.filter(user_type__description="Customer")
-
-    def administrator(self):
-        return self.filter(user_type__description="Administrator")
-
-    def delivery_man(self):
-        return self.filter(user_type__description="Delivery Man")
-
-    def order_by_name(self):
-        return self.order_by("name")
 
 
 class DeliveryPersonQuerySet(QuerySet):
