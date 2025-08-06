@@ -121,7 +121,7 @@ async def consumer_accepted(queue_name: str) -> None:
                     continue
 
                 try:
-                    delivery_person = await sync_to_async(DeliveryPerson.objects.get)(id=delivery_person_id)
+                    delivery_person = await sync_to_async(DeliveryPerson.objects.get)(user_id=delivery_person_id)
                     logging.info(f"Delivery person encontrada: ID {delivery_person.id}")
                 except DeliveryPerson.DoesNotExist:
                     logging.warning(f"Delivery Person com id {delivery_person_id} não encontrada")
