@@ -1,4 +1,4 @@
-name: CI 0rder Service
+name: CI Order Service
 # Enable Buildkit and let compose use it to speed up image building
 env:
   DOCKER_BUILDKIT: 1
