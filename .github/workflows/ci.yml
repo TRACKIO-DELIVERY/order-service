@@ -82,7 +82,7 @@ jobs:
         run: docker compose -f docker-compose.local.yml down
 
   sync_notify_trackio:
-    if : github.event_name == 'p  ush' && github.ref == 'refs/heads/main'
+    if : github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [linter, pytest]
     steps:
