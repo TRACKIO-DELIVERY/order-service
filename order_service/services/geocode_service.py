@@ -5,6 +5,12 @@ from django.conf import settings
 
 
 class GeoocodeService:
+    """
+    Class to handle geocoding operations using the Google Geocoding API.
+    This service provides methods to convert addresses to geographic coordinates
+    (latitude and longitude).
+    """
+
     @staticmethod
     def address_to_coordinates(address: str) -> dict:
         url = "https://maps.googleapis.com/maps/api/geocode/json"
