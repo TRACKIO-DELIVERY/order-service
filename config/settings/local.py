@@ -1,7 +1,10 @@
 # ruff: noqa: E501
+from celery.schedules import crontab
+
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
+from .base import SPECTACULAR_SETTINGS
 from .base import env
 
 # GENERAL
@@ -66,5 +69,27 @@ INSTALLED_APPS += ["django_extensions"]
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
-# Your stuff...
-# ------------------------------------------------------------------------------
+
+SPECTACULAR_SETTINGS["SERVERS"] = [
+    {"url": "http://localhost:8000", "description": "Local development server"},
+]
+
+CELERY_BEAT_SCHEDULE = {
+    "backup_postgres_diario_teste": {
+        "task": "order_service.core.tasks.generate_backup_postgres",
+        "schedule": crontab(hour=2, minute=0),
+        # utilizar 5 minutos para testes minute='*/5'
+    },
+    "consumir_fila": {
+        "task": "order_service.core.tasks.consumer_order_delivered",
+        "schedule": crontab(minute="*/1"),
+    },
+    "consumir_fila_in_rout": {
+        "task": "order_service.core.tasks.consumer_order_in_route",
+        "schedule": crontab(minute="*/1"),
+    },
+    "consumir_fila_accepted": {
+        "task": "order_service.core.tasks.consumer_order_accepted",
+        "schedule": crontab(minute="*/1"),
+    },
+}

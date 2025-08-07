@@ -4,13 +4,18 @@ from django.contrib import admin
 from django.urls import include
 from django.urls import path
 from django.views import defaults as default_views
+from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularRedocView
 from drf_spectacular.views import SpectacularSwaggerView
-from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenVerifyView
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("", RedirectView.as_view(pattern_name="home", permanent=False)),
+    path("home/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
         "about/",
         TemplateView.as_view(template_name="pages/about.html"),
@@ -21,8 +26,8 @@ urlpatterns = [
     # User management
     path("users/", include("order_service.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
-    # ...
+    # Django Prometheus
+    path("", include("django_prometheus.urls")),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
@@ -31,15 +36,20 @@ urlpatterns = [
 urlpatterns += [
     # API base url
     path("api/", include("config.api_router")),
+    path("api/auth/social/", include("order_service.authentication.api.social.urls")),
     # DRF auth token
-    path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="api-schema"), name="redoc"),
     path(
         "api/docs/",
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
 ]
+
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit

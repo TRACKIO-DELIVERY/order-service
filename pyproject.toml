@@ -60,6 +60,7 @@ extend-exclude = [
     "*/migrations/*.py",
     "staticfiles/*",
 ]
+line-length=120
 
 [tool.ruff.lint]
 select = [
@@ -127,6 +128,19 @@ ignore = [
           # Deactivated because it can make the code slow:
           # https://github.com/astral-sh/ruff/issues/7871
   "COM812",
+  "G004",
+  "TRY401",
+  "TRY002",
+  "TRY003",
+  "TRY300",
+  "EM101",
+  "FBT002",
+  "BLE001", #blind exceptions
+  "TRY301", #abstract raise
+  "ERA001",
+  "C901",
+  "PLR0915",
+  "SIM108",
 ]
 # The fixes in extend-unsafe-fixes will require
 # provide the `--unsafe-fixes` flag when fixing.

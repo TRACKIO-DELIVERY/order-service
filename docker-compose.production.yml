@@ -1,8 +1,6 @@
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
-  production_traefik: {}
-
   production_redis_data: {}
 
 
@@ -11,8 +9,9 @@ services:
   django: &django
     build:
       context: .
-      dockerfile: ./compose/production/django/Dockerfile
+      dockerfile: ./compose/local/django/Dockerfile
 
+    container_name: order_service_django
     image: order_service_production_django
     depends_on:
       - postgres
@@ -20,12 +19,16 @@ services:
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
+      - ./.envs/.production/.google
+      - ./.envs/.production/.rabbitmq
     command: /start
 
   postgres:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
+
+    container_name: order_service_postgres
     image: order_service_production_postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data
@@ -33,47 +36,29 @@ services:
     env_file:
       - ./.envs/.production/.postgres
 
-  traefik:
-    build:
-      context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: order_service_production_traefik
-    depends_on:
-      - django
-    volumes:
-      - production_traefik:/etc/traefik/acme
-    ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
-      - '0.0.0.0:5555:5555'
-
   redis:
+    container_name: order_service_redis
     image: docker.io/redis:6
 
     volumes:
       - production_redis_data:/data
 
-
   celeryworker:
     <<: *django
+
+    container_name: order_service_celeryworker
     image: order_service_production_celeryworker
     command: /start-celeryworker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - production_postgres_data_backups:/backups
+    depends_on:
+      - django
 
   celerybeat:
     <<: *django
+    container_name: order_service_celerybeat
     image: order_service_production_celerybeat
     command: /start-celerybeat
-
-  flower:
-    <<: *django
-    image: order_service_production_flower
-    command: /start-flower
-
-  awscli:
-    build:
-      context: .
-      dockerfile: ./compose/production/aws/Dockerfile
-    env_file:
-      - ./.envs/.production/.django
-    volumes:
-      - production_postgres_data_backups:/backups:z
+    depends_on:
+      - django

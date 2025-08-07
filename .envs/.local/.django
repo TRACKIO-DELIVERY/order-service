@@ -1,14 +1,52 @@
 # General
 # ------------------------------------------------------------------------------
+# DJANGO_READ_DOT_ENV_FILE=True
+DJANGO_SETTINGS_MODULE=config.settings.local
+DJANGO_SECRET_KEY=px9lsJqtLzOVdFg4LamTtl01rBcFsGllE98el5vzwJ0dWjVltuj2rx56L4cLwX1l
+JWT_SIGNING_KEY=px9lsJqtLzOVdFg4LamTtl01rBcFsGllE98el5vzwJ0dWjVltuj2rx56L4cLwX1l
+DJANGO_ADMIN_URL=g2ZnVJWuaI9AokB1PwXXbp2zzxymsGRp/
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+
 USE_DOCKER=yes
+
+# Security
+# ------------------------------------------------------------------------------
+# TIP: better off using DNS, however, redirect is OK too
+DJANGO_SECURE_SSL_REDIRECT=False
+
+# Email
+# ------------------------------------------------------------------------------
+DJANGO_SERVER_EMAIL=
+
+MAILGUN_API_KEY=
+MAILGUN_DOMAIN=
+
+
+
+# django-allauth
+# ------------------------------------------------------------------------------
+DJANGO_ACCOUNT_ALLOW_REGISTRATION=True
+
+# Gunicorn
+# ------------------------------------------------------------------------------
+WEB_CONCURRENCY=4
+
+
+
 IPYTHONDIR=/app/.ipython
+DEBUG=True
+DJANGO_SETTINGS_MODULE=config.settings.local
+
 # Redis
 # ------------------------------------------------------------------------------
 REDIS_URL=redis://redis:6379/0
 
 # Celery
+CELERY_BROKER_URL=redis://redis:6379/0
+DATABASE_URL=postgres://PjuHeKcBPyqGCsZHUouCBBTuySoOnWfT:yZbpeuasS0MoLdIooF1w4wLjSwcv6LXPIXayySDCDIIvufQ8WCVzNVUqtQpJsRhV@postgres:5432/order_service
+
 # ------------------------------------------------------------------------------
 
 # Flower
 CELERY_FLOWER_USER=cPPrtPKdGAoQAWVbSkEHKvnAbOYFVKbz
-CELERY_FLOWER_PASSWORD=lxRZJhMPK0ibCD20Ikse5FbSUXiDSgNajeODXOSLCi0LHGOElJdhVAlvHTkZEKS3
+CELERY_FLOWER_PASSWORD=fEXjpFjl5MuPj4DZcrLY8Vim66WZDWA6Z96vfUE2pRJppzkPHhtJ5Ui8Sbg8RRCU

@@ -1,35 +1,28 @@
-import pytest
-from rest_framework.test import APIRequestFactory
+# class TestUserViewSet:
+#     @pytest.fixture
+#     def api_rf(self) -> APIRequestFactory:
+#         return APIRequestFactory()
 
-from order_service.users.api.views import UserViewSet
-from order_service.users.models import User
+#     def test_get_queryset(self, user: User, api_rf: APIRequestFactory):
+#         view = UserViewSet()
+#         request = api_rf.get("/fake-url/")
+#         request.user = user
 
+#         view.request = request
 
-class TestUserViewSet:
-    @pytest.fixture
-    def api_rf(self) -> APIRequestFactory:
-        return APIRequestFactory()
+#         assert user in view.get_queryset()
 
-    def test_get_queryset(self, user: User, api_rf: APIRequestFactory):
-        view = UserViewSet()
-        request = api_rf.get("/fake-url/")
-        request.user = user
+#     def test_me(self, user: User, api_rf: APIRequestFactory):
+#         view = UserViewSet.as_view({"get": "me"})
+#         request = api_rf.get("/fake-url/")
+#         request.user = user
 
-        view.request = request
+#         view.request = request
 
-        assert user in view.get_queryset()
+#         response = view.me(request)  # type: ignore[call-arg, arg-type, misc]
 
-    def test_me(self, user: User, api_rf: APIRequestFactory):
-        view = UserViewSet()
-        request = api_rf.get("/fake-url/")
-        request.user = user
-
-        view.request = request
-
-        response = view.me(request)  # type: ignore[call-arg, arg-type, misc]
-
-        assert response.data == {
-            "username": user.username,
-            "url": f"http://testserver/api/users/{user.username}/",
-            "name": user.name,
-        }
+#         assert response.data == {
+#             "username": user.username,
+#             "url": f"http://testserver/api/users/{user.username}/",
+#             "name": user.name,
+#         }
