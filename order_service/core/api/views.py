@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 from django.db import transaction
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from order_service.core.models import ComplementaryOrder
@@ -57,6 +58,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     queryset = Order.objects.all().select_related("complementary_order", "delivery_person__user")
     serializer_class = OrderReadSerializer
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -88,7 +90,6 @@ class OrderTrackingViewSet(viewsets.ModelViewSet):
     """
 
     queryset = OrderTracking.objects.all()
-
     serializer_class = OrderTrackingReadSerializer
 
     def get_serializer_class(self):

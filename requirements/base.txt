@@ -25,3 +25,6 @@ aio-pika==9.5.5
 djangorestframework_simplejwt==5.5.1
 google-auth==2.40.3
 django-prometheus==2.4.1
+
+django-silk==5.4.0
+sentry-sdk==2.34.1

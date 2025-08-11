@@ -17,6 +17,13 @@ class OrderQuerySet(QuerySet):
     def status_in_production(self):
         return self.filter(status__description="In Production")
 
+    def by_administrator(self, user):
+        """
+        Returns orders managed by the given user.
+        """
+        establishments = list(user.establishments.all().values_list("id", flat=True))
+        return self.filter(establishment__in=establishments)
+
 
 class EstablishmentQueryset(QuerySet):
     def by_administrator(self, user):

@@ -14,7 +14,7 @@ router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 router.register(r"users", UserViewSet)
 router.register(r"delivery-people", DeliveryPersonViewSet)
-router.register(r"orders", OrderViewSet)
+router.register(r"orders", OrderViewSet, basename="orders")
 router.register(r"tracking", OrderTrackingViewSet)
 router.register(r"complementary-order", ComplementaryOrderViewSet)
 router.register(r"aligned-order", OrderAlignedViewSet, basename="aligned-order")

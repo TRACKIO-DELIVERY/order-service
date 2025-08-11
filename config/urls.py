@@ -50,6 +50,7 @@ urlpatterns += [
     ),
 ]
 
+urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
