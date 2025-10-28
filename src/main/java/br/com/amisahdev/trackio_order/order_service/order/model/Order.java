@@ -19,8 +19,10 @@ public class Order extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "companyId")
     private Company company;
     @ManyToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "customerId")
     private Customer customer;
     private LocalDateTime orderDate;
     private BigDecimal orderAmount;

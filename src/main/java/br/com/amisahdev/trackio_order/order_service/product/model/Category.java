@@ -16,6 +16,7 @@ public class Category {
     private Long id;
     private String name;
     @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "companyId")
     private Company company;
 
 }

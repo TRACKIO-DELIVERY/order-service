@@ -19,6 +19,7 @@ public class Product extends TimeStamp {
     @Column(name = "id_product", nullable = false)
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "companyId")
     private Company company;
     private String name;
     private String description;
