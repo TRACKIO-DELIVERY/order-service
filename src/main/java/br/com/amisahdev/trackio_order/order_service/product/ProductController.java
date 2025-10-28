@@ -32,7 +32,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Validation error handler — catches @Valid errors and formats response
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -45,7 +44,6 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // Handle general bad JSON type errors (e.g., string instead of number)
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatch(org.springframework.http.converter.HttpMessageNotReadableException ex) {
         Map<String, Object> response = new HashMap<>();
