@@ -18,12 +18,23 @@ public class Product extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_product", nullable = false)
     private Long id;
+
     @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "companyId")
     private Company company;
+
+    @Column(nullable = false)
     private String name;
+
     private String description;
+
+    @Column(nullable = false)
+    private Integer stock;
+
+    @Column(nullable = false)
     private BigDecimal price;
-    private Integer quantity;
+
     private String image_url;
+
 
 }
