@@ -17,7 +17,7 @@ public class Company extends User {
     @Column(length = 14, nullable = false, unique = true)
     private String cnpj;
     @Column(length = 100, nullable = false)
-    private String bussiness_name;
-    private String image_url;
+    private String bussinessName;
+    private String imageUrl;
 
 }

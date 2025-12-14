@@ -1,0 +1,18 @@
+package br.com.amisahdev.trackio_order.order_service.order.dto.response;
+
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+public class OrderItemResponse {
+    private Long id;
+    private Long orderId;
+    private Long productId;
+    private String productName;
+    private Double quantity;
+    private BigDecimal price;
+}

@@ -16,6 +16,7 @@ public class Categoy {
     private Long id;
     private String name;
     @ManyToOne
+    @JoinColumn(name = "company_id")
     private Company company;
 
 }
