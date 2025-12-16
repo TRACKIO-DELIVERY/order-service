@@ -18,7 +18,7 @@ public class ProductLog {
     private Long id;
     private String action;
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id_product")
     private Product product;
     @CreationTimestamp
     private LocalDateTime logDate;
