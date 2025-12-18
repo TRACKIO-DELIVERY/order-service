@@ -1,5 +1,6 @@
 package br.com.amisahdev.trackio_order.order_service.user.dto.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -16,10 +17,13 @@ public class CustomerRequest extends UserRequest {
     @Size(min = 11, max = 11,message = "CPF must have 11 digits.")
     private String cpf;
 
-    @NotNull
+    @NotNull(message = "dateOfBirth is required")
     @Past
     private LocalDate dateOfBirth;
 
-    @NotBlank
     private String imageUrl;
+
+    @Valid
+    @NotNull(message = "AddressId is required")
+    private AddressRequest address;
 }

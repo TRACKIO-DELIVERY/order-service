@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 
 @Getter
 @Setter
 public class CustomerResponse extends UserResponse{
     private String cpf;
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
     private String image_url;
+    private AddressResponse address;
 }

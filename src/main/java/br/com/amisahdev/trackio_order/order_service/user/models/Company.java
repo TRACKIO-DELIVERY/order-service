@@ -1,15 +1,12 @@
 package br.com.amisahdev.trackio_order.order_service.user.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "company")
-@PrimaryKeyJoinColumn(name = "companyId")
+@PrimaryKeyJoinColumn(name = "company_id", referencedColumnName = "user_id")
 @Getter
 @Setter
 public class Company extends User {
@@ -19,5 +16,8 @@ public class Company extends User {
     @Column(length = 100, nullable = false)
     private String bussinessName;
     private String imageUrl;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id_address")
+    private Address address;
 
 }

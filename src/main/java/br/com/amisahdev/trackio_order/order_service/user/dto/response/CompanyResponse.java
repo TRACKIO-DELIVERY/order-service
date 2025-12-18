@@ -10,4 +10,5 @@ public class CompanyResponse extends UserResponse {
     private String cnpj;
     private String bussinessName;
     private String imageUrl;
+    private AddressResponse address;
 }

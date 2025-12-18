@@ -12,6 +12,7 @@ import lombok.Setter;
 public class Address extends TimeStamp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_address")
     private Long idAddress;
 
     @Column(length = 200, nullable = false)

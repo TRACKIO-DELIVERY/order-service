@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "deliveryPerson")
-@PrimaryKeyJoinColumn(name = "DeliveryPersonId")
+@PrimaryKeyJoinColumn(name = "DeliveryPersonId" , referencedColumnName = "user_id")
 @Getter
 @Setter
 public class DeliveryPerson extends User {
