@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -30,6 +31,11 @@ public class ProductController {
         response.put("status", 201);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<String> getAllProducts() {
+        return ResponseEntity.ok("All products");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
