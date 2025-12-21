@@ -1,4 +1,15 @@
 services:
+  order-spring:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - postgres_db
+      - infra_api_gateway
   postgres:
     image: postgres:16
     environment:
@@ -7,14 +18,17 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
     ports:
       - "5432:5432"
-  rabbitmq:
-    image: rabbitmq:latest
-    environment:
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
-    ports:
-      - '5672'
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
+    networks:
+      - postgres_db
   redis:
     image: redis:latest
     ports:
       - '6379'
+networks:
+  postgres_db:
+    driver: bridge
+
+  infra_api_gateway:
+    external: true
