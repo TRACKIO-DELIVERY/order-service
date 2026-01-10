@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "company")
 @PrimaryKeyJoinColumn(name = "company_id", referencedColumnName = "user_id")
@@ -19,5 +21,6 @@ public class Company extends User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", referencedColumnName = "id_address")
     private Address address;
+    private BigDecimal deliveryFee;
 
 }

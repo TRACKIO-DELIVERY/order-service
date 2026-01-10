@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class OrderItemResponse {
-    private Long id;
-    private Long orderId;
     private Long productId;
     private String productName;
     private Double quantity;

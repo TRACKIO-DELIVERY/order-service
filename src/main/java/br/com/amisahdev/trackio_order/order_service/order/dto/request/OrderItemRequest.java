@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 @Setter
 public class OrderItemRequest {
 
-    @NotNull(message = "orderId is required")
-    private Long orderId;
+//    @NotNull(message = "orderId is required")
+//    private Long orderId;
 
     @NotNull(message = "productId is required")
     private Long productId;
@@ -23,7 +23,7 @@ public class OrderItemRequest {
     @Positive(message = "Quantity must be greater than zero")
     private Double quantity;
 
-    @NotNull(message = "Price is required")
-    @Positive(message = "price must be greater than zero")
-    private BigDecimal price;
+//    @NotNull(message = "Price is required")
+//    @Positive(message = "price must be greater than zero")
+//    private BigDecimal price;
 }

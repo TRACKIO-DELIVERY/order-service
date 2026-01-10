@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,10 +24,11 @@ public class OrderRequest {
     @NotNull(message = "Customer is required")
     private Long customerId;
 
-    @NotNull(message = "OrderDate is required")
-    private LocalDateTime orderDate;
-
-    @NotNull(message = "orderAmount is required")
-    @Positive(message = "orderAmount must be greater than zero")
-    private BigDecimal orderAmount;
+//    @NotNull(message = "OrderDate is required")
+//    private LocalDateTime orderDate;
+//
+//    @NotNull(message = "orderAmount is required")
+//    @Positive(message = "orderAmount must be greater than zero")
+//    private BigDecimal orderAmount;
+    List<OrderItemRequest> items;
 }

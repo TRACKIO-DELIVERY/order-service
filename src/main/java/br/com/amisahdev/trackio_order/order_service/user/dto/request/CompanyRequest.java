@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
@@ -20,8 +22,8 @@ public class CompanyRequest extends UserRequest{
     private String bussinessName;
 
     private String imageUrl;
-
     @Valid
     @NotNull(message = "AddressId is required")
     private AddressRequest address;
+    private BigDecimal deliveryFee;
 }
