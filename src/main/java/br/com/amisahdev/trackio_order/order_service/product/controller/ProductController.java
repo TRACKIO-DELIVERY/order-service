@@ -7,8 +7,10 @@ import br.com.amisahdev.trackio_order.order_service.product.service.interf.Produ
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,14 +20,23 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(request));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> create(
+            @Valid @RequestPart("product") ProductRequest request,
+            @RequestPart("image") MultipartFile image) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productService.create(request, image));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> update(@PathVariable long id, @Valid @RequestBody ProductRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.update(id,request));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestPart("request") ProductRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productService.update(id, request, image));
     }
 
     @GetMapping("/{id}")

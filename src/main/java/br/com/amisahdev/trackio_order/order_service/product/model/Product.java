@@ -41,4 +41,6 @@ public class Product extends TimeStamp {
     @Column(name = "image_url")
     private String imageUrl;
 
+    private String fileKey;
+
 }
