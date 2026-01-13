@@ -110,11 +110,17 @@ public class ProductServiceImp implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (product.getFileKey() != null) {
-            s3Service.deleteFile(product.getFileKey());
-        }
+        String fileKey = product.getFileKey();
 
         productRepository.deleteById(id);
+
+        if (fileKey != null && !fileKey.isEmpty()) {
+            try {
+                s3Service.deleteFile(fileKey);
+            } catch (Exception e) {
+                System.err.println("Erro ao deletar arquivo no S3: " + e.getMessage());
+            }
+        }
     }
 
     @Override

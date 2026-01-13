@@ -22,5 +22,6 @@ public class Company extends User {
     @JoinColumn(name = "address_id", referencedColumnName = "id_address")
     private Address address;
     private BigDecimal deliveryFee;
+    private String fileKey;
 
 }

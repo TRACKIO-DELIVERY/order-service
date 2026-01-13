@@ -7,8 +7,10 @@ import br.com.amisahdev.trackio_order.order_service.user.service.interf.Customer
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -16,14 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping
-    public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CustomerRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CustomerResponse> create(
+            @Valid @RequestPart CustomerRequest request,
+            @RequestPart("image") MultipartFile image) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request,image));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> update(@PathVariable Long id, @Valid @RequestBody CustomerRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id,request));
+    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CustomerResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestPart CustomerRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id,request,image));
     }
 
     @GetMapping("/{id}")

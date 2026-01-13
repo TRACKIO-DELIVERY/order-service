@@ -18,10 +18,11 @@ public class Customer extends User {
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date dateOfBirth;
-    @Column(length = 11, nullable = false)
+    @Column(length = 255, nullable = false,name = "image_url")
     private String imageUrl;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", referencedColumnName = "id_address")
     private Address address;
+    private String fileKey;
 
 }

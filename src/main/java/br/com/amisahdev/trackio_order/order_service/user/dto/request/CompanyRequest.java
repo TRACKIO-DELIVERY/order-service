@@ -17,11 +17,8 @@ public class CompanyRequest extends UserRequest{
     @NotBlank(message = "CNPJ is required")
     @Size(min = 14, max = 14,message = "CNPJ must have 14 digits.")
     private String cnpj;
-
     @NotBlank(message = "bussinesName is required")
     private String bussinessName;
-
-    private String imageUrl;
     @Valid
     @NotNull(message = "AddressId is required")
     private AddressRequest address;

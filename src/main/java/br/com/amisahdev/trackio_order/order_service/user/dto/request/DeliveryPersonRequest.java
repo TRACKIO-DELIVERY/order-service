@@ -16,9 +16,6 @@ public class DeliveryPersonRequest extends UserRequest {
     @NotBlank(message = "vehicleType is required")
     private String vehicleType;
 
-    @NotBlank(message = "imageUrl is required")
-    private String imageUrl;
-
     @NotNull(message = "active is required")
     private Boolean active;
 }
