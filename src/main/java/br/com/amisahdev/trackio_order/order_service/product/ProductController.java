@@ -3,7 +3,12 @@ package br.com.amisahdev.trackio_order.order_service.product;
 
 import br.com.amisahdev.trackio_order.order_service.product.model.Product;
 import br.com.amisahdev.trackio_order.order_service.product.repository.ProductRepository;
+import br.com.amisahdev.trackio_order.order_service.security.context.UserContext;
+import br.com.amisahdev.trackio_order.order_service.user.models.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -15,12 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private UserContext userContext;
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createProduct(@Valid @RequestBody Product product) {
@@ -35,6 +43,10 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<String> getAllProducts() {
+        User user = userContext.getUser();
+        log.info("Getting all products");
+        log.info(user.toString());
+
         return ResponseEntity.ok("All products");
     }
 
