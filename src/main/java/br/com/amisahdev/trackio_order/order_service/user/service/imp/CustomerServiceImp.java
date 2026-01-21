@@ -118,6 +118,7 @@ public class CustomerServiceImp implements CustomerService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(()  -> new RuntimeException("Customer not found"));
@@ -130,12 +131,13 @@ public class CustomerServiceImp implements CustomerService {
             try {
                 s3Service.deleteFile(fileKey);
             } catch (Exception e) {
-                System.err.println("Erro ao deletar arquivo no S3: " + e.getMessage());
+                System.err.println("Error deleting file in S3: " + e.getMessage());
             }
         }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CustomerResponse findById(Long id) {
         Customer entity = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
@@ -143,6 +145,7 @@ public class CustomerServiceImp implements CustomerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CustomerResponse findByCpf(String cpf) {
         Customer customer = customerRepository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));

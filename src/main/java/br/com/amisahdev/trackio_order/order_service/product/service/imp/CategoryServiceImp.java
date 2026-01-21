@@ -9,6 +9,7 @@ import br.com.amisahdev.trackio_order.order_service.product.service.interf.Categ
 import br.com.amisahdev.trackio_order.order_service.user.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class CategoryServiceImp implements CategoryService {
     private final CompanyRepository companyRepository;
 
     @Override
+    @Transactional
     public CategoryResponse create(CategoryRequest request) {
 
         companyRepository.findById(request.getCompanyId())
@@ -42,6 +44,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = categoryRepository
                 .findByIdAndCompany_UserId(id, request.getCompanyId())
@@ -64,6 +67,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -72,6 +76,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponse findById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -80,6 +85,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> findAllByCompany_Id(Long id) {
         return categoryRepository.findAllByCompany_UserId(id)
                 .stream()
