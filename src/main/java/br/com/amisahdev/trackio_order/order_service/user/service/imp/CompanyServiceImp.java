@@ -43,7 +43,7 @@ public class CompanyServiceImp implements CompanyService {
 
         if (image != null && !image.isEmpty()) {
             try {
-                String imageUrl = amazonS3Service.uploadFile(image,"Customer");
+                String imageUrl = amazonS3Service.uploadFile(image,"Company");
                 toEntity.setFileKey(imageUrl);
                 uploadedKey = imageUrl;
                 String fullUrl = String.format("https://%s.s3.%s.amazonaws.com/%s",

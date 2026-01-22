@@ -7,8 +7,12 @@ import br.com.amisahdev.trackio_order.order_service.user.service.interf.CompanyS
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.print.attribute.standard.Media;
 
 
 @RestController
@@ -18,9 +22,11 @@ public class CompanyController {
 
     private final CompanyService companyService;
 
-    @PostMapping
-    public ResponseEntity<CompanyResponse> create(@Valid @RequestBody CompanyRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(companyService.create(request));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CompanyResponse> create(
+            @Valid @RequestPart CompanyRequest request,
+            @RequestPart("image")MultipartFile image) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(companyService.create(request,image));
     }
 
     @GetMapping("/{id}")
@@ -28,9 +34,12 @@ public class CompanyController {
         return ResponseEntity.status(HttpStatus.OK).body(companyService.findById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CompanyResponse> update(@PathVariable Long id, @Valid @RequestBody CompanyRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(companyService.update(id, request));
+    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CompanyResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestPart CompanyRequest request,
+            @RequestPart("image") MultipartFile image) {
+        return ResponseEntity.status(HttpStatus.OK).body(companyService.update(id, request,image));
     }
 
     @DeleteMapping("/{id}")
