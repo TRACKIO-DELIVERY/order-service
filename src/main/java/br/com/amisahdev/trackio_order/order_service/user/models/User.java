@@ -13,6 +13,7 @@ import lombok.Setter;
 public abstract class User extends TimeStamp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
     @Column(length = 50, nullable = false)
     private String username;

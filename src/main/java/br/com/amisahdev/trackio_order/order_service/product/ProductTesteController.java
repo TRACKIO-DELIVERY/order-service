@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/api/product")
-public class ProductController {
+@RequestMapping("/api/teste/product")
+public class ProductTesteController {
 
     @Autowired
     private ProductRepository productRepository;

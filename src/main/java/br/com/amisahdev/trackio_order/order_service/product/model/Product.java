@@ -20,8 +20,12 @@ public class Product extends TimeStamp {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "company_id", referencedColumnName = "companyId")
+    @JoinColumn(name = "company_id")
     private Company company;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(nullable = false)
     private String name;
@@ -34,7 +38,7 @@ public class Product extends TimeStamp {
     @Column(nullable = false)
     private BigDecimal price;
 
-    private String image_url;
-
+    @Column(name = "image_url")
+    private String imageUrl;
 
 }
