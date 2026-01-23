@@ -1,6 +1,6 @@
-package br.com.amisahdev.trackio_order.order_service.user.mappers;
+package br.com.amisahdev.trackio_order.order_service.user.mapper;
 
-import br.com.amisahdev.trackio_order.order_service.user.dtos.UserKeycloakDto;
+import br.com.amisahdev.trackio_order.order_service.user.dto.UserKeycloakDto;
 import br.com.amisahdev.trackio_order.order_service.user.models.Company;
 import br.com.amisahdev.trackio_order.order_service.user.models.User;
 import org.springframework.stereotype.Component;

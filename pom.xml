@@ -11,9 +11,8 @@
 	<groupId>br.com.amisahdev.trackio-order</groupId>
 	<artifactId>order-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
     <name>order-service</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Boot Service for managing delivery service</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -21,9 +20,7 @@
 	<developers>
 		<developer/>
 	</developers>
-    <modules>
-        <module>order-core</module>
-    </modules>
+
     <scm>
 		<connection/>
 		<developerConnection/>

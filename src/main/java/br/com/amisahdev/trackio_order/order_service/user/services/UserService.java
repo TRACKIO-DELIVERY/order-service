@@ -1,7 +1,7 @@
 package br.com.amisahdev.trackio_order.order_service.user.services;
 
-import br.com.amisahdev.trackio_order.order_service.user.dtos.UserKeycloakDto;
-import br.com.amisahdev.trackio_order.order_service.user.mappers.UserMapper;
+import br.com.amisahdev.trackio_order.order_service.user.dto.UserKeycloakDto;
+import br.com.amisahdev.trackio_order.order_service.user.mapper.UserMapper;
 import br.com.amisahdev.trackio_order.order_service.user.models.User;
 import br.com.amisahdev.trackio_order.order_service.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
