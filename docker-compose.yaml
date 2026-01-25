@@ -7,6 +7,10 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
     ports:
       - "5433:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
+    networks:
+      - postgres_db
   rabbitmq:
     image: rabbitmq:latest
     environment:
@@ -18,3 +22,9 @@ services:
     image: redis:latest
     ports:
       - '6379'
+networks:
+  postgres_db:
+    driver: bridge
+
+  infra_api_gateway:
+    external: true
