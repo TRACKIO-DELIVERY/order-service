@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/orders")
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.orderDelivery(request));
     }
 
-    @PatchMapping("/canceled")
+    @PatchMapping("/cancelled")
     public ResponseEntity<OrderResponse> cancelOrder(@Valid @RequestBody OrderCompletedCanceledRequest request) {
         return ResponseEntity.status((HttpStatus.OK)).body(orderService.orderCancel(request));
     }
@@ -41,6 +43,31 @@ public class OrderController {
     @PatchMapping("/completed")
     public ResponseEntity<OrderResponse> completedOrder(@Valid @RequestBody OrderCompletedCanceledRequest request) {
         return ResponseEntity.status((HttpStatus.OK)).body(orderService.orderCompleted(request));
+    }
+
+    @GetMapping("/findall")
+    public ResponseEntity<List<OrderResponse>> findAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findAll());
+    }
+
+    @GetMapping("/findall/In_Route")
+    public ResponseEntity<List<OrderResponse>> findAllInRoute() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findAllInRoute());
+    }
+
+    @GetMapping("/findall/In_Progress")
+    public ResponseEntity<List<OrderResponse>> findAllInProgress() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findAllInProgress());
+    }
+
+    @GetMapping("/findall/Cancelled")
+    public ResponseEntity<List<OrderResponse>> findAllCancelled() {
+        return  ResponseEntity.status(HttpStatus.OK).body(orderService.findAllInCancelled());
+    }
+
+    @GetMapping("/findall/Completed")
+    public ResponseEntity<List<OrderResponse>> findAllCompleted() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findAllInCompleted());
     }
 
 }

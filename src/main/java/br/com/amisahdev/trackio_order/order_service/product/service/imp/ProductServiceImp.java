@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -46,6 +47,14 @@ public class ProductServiceImp implements ProductService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
 
+        if (request.getPrice() == null || request.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Price must be greater than zero");
+        }
+
+        if (request.getStock() == null || request.getStock() <= 0) {
+            throw new RuntimeException("Stock must be greater than zero");
+        }
+
         Product entity = productMapper.toEntity(request);
         entity.setCompany(company);
         entity.setCategory(category);
@@ -62,6 +71,7 @@ public class ProductServiceImp implements ProductService {
                 throw new RuntimeException("Failed to upload image to S3", e);
             }
         }
+
 
         Product saved = productRepository.save(entity);
 
