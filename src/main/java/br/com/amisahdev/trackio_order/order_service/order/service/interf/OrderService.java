@@ -12,6 +12,10 @@ public interface OrderService {
     OrderResponse create (OrderRequest request);
     OrderResponse findById(Long id);
     List<OrderResponse> findAll();
+    List<OrderResponse> findAllInRoute();
+    List<OrderResponse> findAllInProgress();
+    List<OrderResponse> findAllInCancelled();
+    List<OrderResponse> findAllInCompleted();
     void deleteById(Long id);
     OrderResponse update (OrderRequest request);
     OrderResponse orderDelivery(OrderDeliveryRequest request);

@@ -30,4 +30,5 @@ public class OrderResponse {
     private BigDecimal orderFlee;
     private OrderStatus orderStatus;
     private List<OrderItemResponse> items;
+    private PaymentResponse payment;
 }

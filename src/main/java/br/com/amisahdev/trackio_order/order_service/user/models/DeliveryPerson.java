@@ -15,5 +15,6 @@ public class DeliveryPerson extends User {
     private String vehicleType;
     private String image_url;
     private Boolean active;
+    private String fileKey;
 
 }

@@ -25,6 +25,4 @@ public class ProductRequest {
     private Integer stock;
     @NotNull(message = "stock is not null")
     private BigDecimal price;
-    @NotBlank(message = "imageUrl is not null")
-    private String imageUrl;
 }

@@ -10,6 +10,7 @@ import org.mapstruct.*;
 public interface CustomerMapper {
     @Mapping(target = "userId",ignore = true)
     Customer toEntity(CustomerRequest request);
+    @Mapping(target = "imageUrl",source = "imageUrl")
     @Mapping(target = "address", source = "address")
     CustomerResponse toResponse(Customer entity);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -31,4 +31,5 @@ public class OrderRequest {
 //    @Positive(message = "orderAmount must be greater than zero")
 //    private BigDecimal orderAmount;
     List<OrderItemRequest> items;
+    PaymentRequest payment;
 }
