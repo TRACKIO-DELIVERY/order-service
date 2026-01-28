@@ -1,6 +1,6 @@
 package br.com.amisahdev.trackio_order.order_service.security.context;
 
-import br.com.amisahdev.trackio_order.order_service.user.dtos.UserKeycloakDto;
+import br.com.amisahdev.trackio_order.order_service.user.dto.UserKeycloakDto;
 import br.com.amisahdev.trackio_order.order_service.user.models.User;
 import br.com.amisahdev.trackio_order.order_service.user.services.UserService;
 import lombok.RequiredArgsConstructor;
