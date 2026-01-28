@@ -16,6 +16,7 @@ public class UserLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "user_user_id")
     private User user;
     private String action;
     @CreationTimestamp

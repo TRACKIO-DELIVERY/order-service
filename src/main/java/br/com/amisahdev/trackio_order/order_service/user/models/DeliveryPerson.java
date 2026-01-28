@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "deliveryPerson")
-@PrimaryKeyJoinColumn(name = "DeliveryPersonId")
+@PrimaryKeyJoinColumn(name = "DeliveryPersonId" , referencedColumnName = "user_id")
 @Getter
 @Setter
 public class DeliveryPerson extends User {
@@ -15,5 +15,6 @@ public class DeliveryPerson extends User {
     private String vehicleType;
     private String image_url;
     private Boolean active;
+    private String fileKey;
 
 }

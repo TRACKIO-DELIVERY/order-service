@@ -17,9 +17,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id",nullable = false)
     private Order order;
-    private String payment_method;
+    private String paymentMethod;
     private BigDecimal amount;
-    private LocalDateTime payment_date;
+    private LocalDateTime paymentDate;
 
 }

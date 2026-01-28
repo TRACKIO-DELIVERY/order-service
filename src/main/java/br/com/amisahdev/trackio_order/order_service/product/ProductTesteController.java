@@ -22,8 +22,8 @@ import java.util.HashMap;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/product")
-public class ProductController {
+@RequestMapping("/api/teste/product")
+public class ProductTesteController {
 
     @Autowired
     private ProductRepository productRepository;
