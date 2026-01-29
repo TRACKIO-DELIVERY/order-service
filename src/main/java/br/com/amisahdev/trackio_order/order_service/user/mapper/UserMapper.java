@@ -14,7 +14,7 @@ public class UserMapper {
                 .email(dto.getEmail())
                 .keycloakUserId(dto.getKeycloakUserId())
                 .cnpj("76616127000100")
-                .bussiness_name("NEGOCIO FANTASIA")
+                .bussinessName("NEGOCIO FANTASIA")
                 .build();
     }
 }

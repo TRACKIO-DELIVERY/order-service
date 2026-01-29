@@ -14,6 +14,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
   order-spring:
     build: .
     env_file:
@@ -31,13 +32,6 @@ services:
     networks:
       - postgres_db
       - infra_api_gateway
-  rabbitmq:
-    image: rabbitmq:latest
-    environment:
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
-    ports:
-      - '5672'
   redis:
     image: redis:latest
     ports:

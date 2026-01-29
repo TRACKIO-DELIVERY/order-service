@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("testing")
 @AutoConfigureMockMvc
-class ProductTesteControllerTest {
+class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,7 +46,7 @@ class ProductTesteControllerTest {
         Company company = Company.builder()
                 .username("COMPANY")
                 .keycloakUserId(UUID.randomUUID())
-                .bussiness_name("Test Company")
+                .bussinessName("Test Company")
                 .cnpj("1234567890")
                 .email("track@email.com")
                 .phone("1234567890")
@@ -66,7 +66,7 @@ class ProductTesteControllerTest {
         product.setDescription("Laptop with 16GB RAM");
         product.setPrice(BigDecimal.valueOf(4500.00));
         product.setStock(10);
-        product.setImage_url("https://example.com/image.jpg");
+        product.setImageUrl("https://example.com/image.jpg");
         product.setCompany(companyRepository.findAll().getFirst());
 
 
