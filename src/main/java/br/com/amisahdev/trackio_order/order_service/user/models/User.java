@@ -50,9 +50,7 @@ public abstract class User extends TimeStamp implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return null; // No password: handled by Keycloak
-    }
+    public String getPassword() {return null;}
 
     @Override
     public boolean isAccountNonExpired() {
