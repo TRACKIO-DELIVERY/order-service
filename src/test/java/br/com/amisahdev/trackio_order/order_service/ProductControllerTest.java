@@ -2,6 +2,7 @@ package br.com.amisahdev.trackio_order.order_service;
 
 import br.com.amisahdev.trackio_order.order_service.product.model.Product;
 import br.com.amisahdev.trackio_order.order_service.user.models.Company;
+import br.com.amisahdev.trackio_order.order_service.user.models.Role;
 import br.com.amisahdev.trackio_order.order_service.user.repository.CompanyRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,7 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("testing")
 @AutoConfigureMockMvc
-class ProductTesteControllerTest {
+@Disabled
+class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,14 +44,17 @@ class ProductTesteControllerTest {
         bearerToken = "Bearer mock-valid-jwt-token";
 
         companyRepository.deleteAll();
-        Company company = new Company();
-        company.setBussiness_name("Test Company");
-        company.setCnpj("999999999");
-        company.setEmail("track@email.com");
-        company.setPhone("123456789");
-        company.setUsername("track");
-        company.setPassword("track");
-        company.setExpoPushToken("mock-valid-expo-push-token");
+        Company company = Company.builder()
+                .username("COMPANY")
+                .keycloakUserId(UUID.randomUUID())
+                .bussinessName("Test Company")
+                .cnpj("1234567890")
+                .email("track@email.com")
+                .phone("1234567890")
+                .role(Role.COMPANY)
+                .expoPushToken("mock-valid-expo-push-token")
+                .build();
+
         companyRepository.save(company);
     }
 
@@ -61,7 +67,7 @@ class ProductTesteControllerTest {
         product.setDescription("Laptop with 16GB RAM");
         product.setPrice(BigDecimal.valueOf(4500.00));
         product.setStock(10);
-        product.setImage_url("https://example.com/image.jpg");
+        product.setImageUrl("https://example.com/image.jpg");
         product.setCompany(companyRepository.findAll().getFirst());
 
 

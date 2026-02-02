@@ -3,12 +3,14 @@ package br.com.amisahdev.trackio_order.order_service.user.controller;
 
 import br.com.amisahdev.trackio_order.order_service.user.dto.request.CompanyRequest;
 import br.com.amisahdev.trackio_order.order_service.user.dto.response.CompanyResponse;
+import br.com.amisahdev.trackio_order.order_service.user.dto.validation.NotRequiresExpoToken;
 import br.com.amisahdev.trackio_order.order_service.user.service.interf.CompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +26,12 @@ public class CompanyController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CompanyResponse> create(
+            @Validated(NotRequiresExpoToken.class)
             @Valid @RequestPart CompanyRequest request,
-            @RequestPart("image")MultipartFile image) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(companyService.create(request,image));
+            @RequestPart(value = "image", required = false)MultipartFile image) {
+
+        CompanyResponse companyResponse = companyService.create(request,image);
+        return ResponseEntity.status(HttpStatus.CREATED).body(companyResponse);
     }
 
     @GetMapping("/{id}")

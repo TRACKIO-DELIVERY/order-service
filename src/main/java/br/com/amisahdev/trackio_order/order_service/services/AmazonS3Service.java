@@ -1,4 +1,5 @@
 package br.com.amisahdev.trackio_order.order_service.services;
+import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @Service
+@Profile("!testing")
 public class AmazonS3Service {
 
     private final S3Client s3Client;

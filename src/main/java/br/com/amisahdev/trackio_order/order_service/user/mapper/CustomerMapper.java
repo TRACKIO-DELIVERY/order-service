@@ -6,8 +6,13 @@ import br.com.amisahdev.trackio_order.order_service.user.dto.response.CustomerRe
 import br.com.amisahdev.trackio_order.order_service.user.models.Customer;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {AddressMapper.class})
+
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, UserCommonMapper.class})
 public interface CustomerMapper {
+    
+    @Mapping(target = "keycloakUserId", ignore = true)
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "email", ignore = true)
     @Mapping(target = "userId",ignore = true)
     Customer toEntity(CustomerRequest request);
     @Mapping(target = "imageUrl",source = "imageUrl")
