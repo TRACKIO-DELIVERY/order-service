@@ -1,6 +1,6 @@
 package br.com.amisahdev.trackio_order.order_service.order.service.imp;
 
-import br.com.amisahdev.trackio_order.order_service.order.Repository.OrderRepository;
+import br.com.amisahdev.trackio_order.order_service.order.repository.OrderRepository;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.OrderCompletedCanceledRequest;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.OrderDeliveryRequest;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.OrderItemRequest;
@@ -21,7 +21,6 @@ import br.com.amisahdev.trackio_order.order_service.user.repository.CompanyRepos
 import br.com.amisahdev.trackio_order.order_service.user.repository.CustomerRepository;
 import br.com.amisahdev.trackio_order.order_service.user.repository.DeliveryPersonRepository;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

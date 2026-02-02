@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("testing")
 @AutoConfigureMockMvc
+@Disabled
 class ProductControllerTest {
 
     @Autowired

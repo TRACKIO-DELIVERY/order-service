@@ -1,13 +1,18 @@
 package br.com.amisahdev.trackio_order.order_service.user.service.imp;
 
+import br.com.amisahdev.trackio_order.order_service.security.context.AuthenticatedUser;
+import br.com.amisahdev.trackio_order.order_service.security.context.UserContext;
 import br.com.amisahdev.trackio_order.order_service.services.AmazonS3Service;
 import br.com.amisahdev.trackio_order.order_service.user.dto.request.CompanyRequest;
 import br.com.amisahdev.trackio_order.order_service.user.dto.response.CompanyResponse;
 import br.com.amisahdev.trackio_order.order_service.user.mapper.AddressMapper;
 import br.com.amisahdev.trackio_order.order_service.user.mapper.CompanyMapper;
+import br.com.amisahdev.trackio_order.order_service.user.mapper.UserCommonMapper;
 import br.com.amisahdev.trackio_order.order_service.user.models.Company;
+import br.com.amisahdev.trackio_order.order_service.user.models.Role;
 import br.com.amisahdev.trackio_order.order_service.user.repository.CompanyRepository;
 import br.com.amisahdev.trackio_order.order_service.user.service.interf.CompanyService;
+import br.com.amisahdev.trackio_order.order_service.user.service.interf.UserService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +29,9 @@ public class CompanyServiceImp implements CompanyService {
     private final CompanyMapper companyMapper;
     private final AddressMapper addressMapper;
     private final AmazonS3Service amazonS3Service;
+    private final UserContext userContext;
+    private final UserService userService;
+    private final UserCommonMapper userCommonMapper;
 
     @Value("${spring.cloud.aws.region.static}")
     private String region;
@@ -34,11 +42,22 @@ public class CompanyServiceImp implements CompanyService {
     @Override
     @Transactional
     public CompanyResponse create(CompanyRequest request, MultipartFile image) {
+
+        AuthenticatedUser authUser = userContext.auth();
+
+        if (userService.findByKeycloakUserId(authUser.keycloakUserId()).isPresent()) {
+            throw new RuntimeException("User already exists");
+        }
         if (companyRepository.existsByCnpj(request.getCnpj())){
             throw new RuntimeException("CNPJ already exists");
         }
+
         Company toEntity = companyMapper.toEntity(request);
 
+        toEntity.setRole(Role.COMPANY);
+        toEntity.setAddress(addressMapper.toEntity(request.getAddress()));
+
+        userCommonMapper.mapKeycloakUser(toEntity, authUser);
         String uploadedKey = null;
 
         if (image != null && !image.isEmpty()) {

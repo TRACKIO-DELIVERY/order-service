@@ -1,4 +1,4 @@
-package br.com.amisahdev.trackio_order.order_service.order.Repository;
+package br.com.amisahdev.trackio_order.order_service.order.repository;
 
 import br.com.amisahdev.trackio_order.order_service.order.model.Order;
 import br.com.amisahdev.trackio_order.order_service.order.model.OrderStatus;

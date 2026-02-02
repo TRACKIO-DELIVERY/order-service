@@ -1,7 +1,9 @@
 package br.com.amisahdev.trackio_order.order_service.security.filter;
 
 import br.com.amisahdev.trackio_order.order_service.security.context.AuthenticatedUser;
-import br.com.amisahdev.trackio_order.order_service.user.services.UserService;
+import br.com.amisahdev.trackio_order.order_service.user.models.Role;
+import br.com.amisahdev.trackio_order.order_service.user.models.User;
+import br.com.amisahdev.trackio_order.order_service.user.service.imp.UserServiceImp;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -24,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KongHeaderAuthenticationFilter extends OncePerRequestFilter {
 
-    private final UserService userService;
+    private final UserServiceImp userServiceImp;
 
     @Override
     protected void doFilterInternal(
@@ -36,6 +39,7 @@ public class KongHeaderAuthenticationFilter extends OncePerRequestFilter {
         String userId = request.getHeader("X-User-Id");
         String username = request.getHeader("X-Username");
         String email = request.getHeader("X-Email");
+        String fullname = request.getHeader("X-Full-Name");
 
         log.info("Incoming request {} {}", request.getMethod(), request.getRequestURI());
         log.info("X-User-Id     = {}", userId);
@@ -44,17 +48,25 @@ public class KongHeaderAuthenticationFilter extends OncePerRequestFilter {
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
+            Optional<User> userOpt =
+                    userServiceImp.findByKeycloakUserId(UUID.fromString(userId));
+
+            Role role = userOpt
+                    .map(User::getRole)
+                    .orElse(Role.SYSTEM);
+
             AuthenticatedUser user = new AuthenticatedUser(
                     UUID.fromString(userId),
                     username,
-                    email
+                    email,
+                    fullname
             );
 
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(
                             user,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_SYSTEM"))
+                            Collections.singletonList( new SimpleGrantedAuthority("ROLE_" + role.name()))
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -1,6 +1,7 @@
 package br.com.amisahdev.trackio_order.order_service.user.dto.request;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

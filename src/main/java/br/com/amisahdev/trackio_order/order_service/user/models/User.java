@@ -4,6 +4,7 @@ import br.com.amisahdev.trackio_order.order_service.geral.models.TimeStamp;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchConnectionDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +28,8 @@ public abstract class User extends TimeStamp implements UserDetails {
     private Long userId;
     @Column(length = 50, nullable = false)
     private String username;
+    @Column(length = 150, nullable = false)
+    private String fullname;
     @Column(length = 50, nullable = false)
     private String email;
     @Column(length = 50, nullable = true)

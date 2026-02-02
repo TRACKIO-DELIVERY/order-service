@@ -1,11 +1,15 @@
 package br.com.amisahdev.trackio_order.order_service.user.service.imp;
 
+import br.com.amisahdev.trackio_order.order_service.security.context.AuthenticatedUser;
+import br.com.amisahdev.trackio_order.order_service.security.context.UserContext;
 import br.com.amisahdev.trackio_order.order_service.services.AmazonS3Service;
 import br.com.amisahdev.trackio_order.order_service.user.dto.request.CustomerRequest;
 import br.com.amisahdev.trackio_order.order_service.user.dto.response.CustomerResponse;
 import br.com.amisahdev.trackio_order.order_service.user.mapper.AddressMapper;
 import br.com.amisahdev.trackio_order.order_service.user.mapper.CustomerMapper;
+import br.com.amisahdev.trackio_order.order_service.user.mapper.UserCommonMapper;
 import br.com.amisahdev.trackio_order.order_service.user.models.Customer;
+import br.com.amisahdev.trackio_order.order_service.user.models.Role;
 import br.com.amisahdev.trackio_order.order_service.user.repository.CustomerRepository;
 import br.com.amisahdev.trackio_order.order_service.user.service.interf.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,9 @@ public class CustomerServiceImp implements CustomerService {
     private final CustomerMapper customerMapper;
     private final AddressMapper addressMapper;
     private final AmazonS3Service s3Service;
+    private final UserServiceImp userService;
+    private final UserContext userContext;
+    private final UserCommonMapper userCommonMapper;
 
     @Value("${spring.cloud.aws.region.static}")
     private String region;
@@ -35,10 +42,20 @@ public class CustomerServiceImp implements CustomerService {
     @Override
     @Transactional
     public CustomerResponse create(CustomerRequest request, MultipartFile image) {
+
+        AuthenticatedUser authUser = userContext.auth();
+
+        if (userService.findByKeycloakUserId(authUser.keycloakUserId()).isPresent()) {
+            throw new RuntimeException("User already exists");
+        }
+
         if(customerRepository.existsByCpf(request.getCpf())){
             throw new RuntimeException("CPF already exists");
         }
         Customer entity = customerMapper.toEntity(request);
+        entity.setRole(Role.CUSTOMER);
+
+        userCommonMapper.mapKeycloakUser(entity, authUser);
         String uploadedKey = null;
 
         if (image != null && !image.isEmpty()) {

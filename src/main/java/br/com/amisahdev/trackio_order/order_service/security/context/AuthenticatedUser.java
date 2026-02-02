@@ -5,5 +5,6 @@ import java.util.UUID;
 public record AuthenticatedUser(
     UUID keycloakUserId,
     String username,
-    String email
+    String email,
+    String fullname
 ) {}
