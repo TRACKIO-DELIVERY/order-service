@@ -12,13 +12,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@TestPropertySource(properties = {
+        "BUCKET_NAME=test-bucket",
+        "aws.region=us-east-1",
+        "aws.accessKey=fake",
+        "aws.secretKey=fake"
+})
 public class CategoryServiceIntegrationTest {
 
     @Autowired private CategoryServiceImp categoryService;
@@ -32,15 +41,16 @@ public class CategoryServiceIntegrationTest {
         categoryRepository.deleteAll();
         companyRepository.deleteAll();
 
-
-        Company company = new Company();
-        company.setBussinessName("Tech Store");
-        company.setCnpj("12345678000199");
-        company.setEmail("admin@techstore.com");
-        company.setUsername("admin_tech");
-        company.setPassword("secure123");
-        company.setExpoPushToken("123456");
-        company.setPhone("84999343899");
+        Company company = Company.builder()
+                .bussinessName("Tech Store")
+                .cnpj("12345678000199")
+                .email("admin@techstore.com")
+                .username("admin_tech")
+                .keycloakUserId(UUID.randomUUID())
+                .expoPushToken("123456")
+                .phone("84999343899")
+                .fullname("Tech Store Admin")
+                .build();
 
         savedCompany = companyRepository.save(company);
     }
@@ -63,12 +73,10 @@ public class CategoryServiceIntegrationTest {
     @Test
     @DisplayName("Integração: Deve impedir nomes duplicados para a mesma empresa no banco")
     void integration_ShouldPreventDuplicateName() {
-
         CategoryRequest request = new CategoryRequest();
         request.setName("Hardware");
         request.setCompanyId(savedCompany.getUserId());
         categoryService.create(request);
-
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> {
             categoryService.create(request);

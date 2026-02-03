@@ -1,4 +1,5 @@
 package br.com.amisahdev.trackio_order.order_service.Unit.Category;
+
 import br.com.amisahdev.trackio_order.order_service.product.dto.request.CategoryRequest;
 import br.com.amisahdev.trackio_order.order_service.product.dto.response.CategoryResponse;
 import br.com.amisahdev.trackio_order.order_service.product.mapper.CategoryMapper;
@@ -28,6 +29,12 @@ public class CategoryServiceTest {
 
     @InjectMocks private CategoryServiceImp categoryService;
 
+    private Company createMockCompany() {
+        return Company.builder()
+                .bussinessName("Trackio Food")
+                .build();
+    }
+
     @Test
     @DisplayName("Deve criar categoria com sucesso")
     void create_Success() {
@@ -35,7 +42,7 @@ public class CategoryServiceTest {
         request.setName("Bebidas");
         request.setCompanyId(1L);
 
-        when(companyRepository.findById(1L)).thenReturn(Optional.of(new Company()));
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(createMockCompany()));
         when(categoryRepository.existsByNameAndCompany_UserId("Bebidas", 1L)).thenReturn(false);
 
         Category entity = new Category();
@@ -56,7 +63,7 @@ public class CategoryServiceTest {
         request.setName("Limpeza");
         request.setCompanyId(1L);
 
-        when(companyRepository.findById(1L)).thenReturn(Optional.of(new Company()));
+        when(companyRepository.findById(1L)).thenReturn(Optional.of(createMockCompany()));
         when(categoryRepository.existsByNameAndCompany_UserId("Limpeza", 1L)).thenReturn(true);
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> categoryService.create(request));

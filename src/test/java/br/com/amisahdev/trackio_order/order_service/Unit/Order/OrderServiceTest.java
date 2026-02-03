@@ -1,6 +1,6 @@
 package br.com.amisahdev.trackio_order.order_service.Unit.Order;
 
-import br.com.amisahdev.trackio_order.order_service.order.Repository.OrderRepository;
+import br.com.amisahdev.trackio_order.order_service.order.repository.OrderRepository;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.*;
 import br.com.amisahdev.trackio_order.order_service.order.dto.response.OrderResponse;
 import br.com.amisahdev.trackio_order.order_service.order.mapper.OrderMapper;
@@ -44,9 +44,14 @@ public class OrderServiceTest {
     @InjectMocks private OrderServiceImp orderService;
 
     private Company createBaseCompany() {
-        Company c = new Company();
-        c.setDeliveryFee(BigDecimal.ZERO);
-        return c;
+        return Company.builder()
+                .bussinessName("Trackio Food")
+                .deliveryFee(new BigDecimal("10.00"))
+                .cnpj("29142202000151")
+                .username("Lucas")
+                .fullname("Lucas")
+                .email("teste@gmail.com")
+                .build();
     }
 
     private Product createBaseProduct() {
@@ -59,6 +64,9 @@ public class OrderServiceTest {
         OrderRequest r = new OrderRequest();
         r.setCustomerId(1L);
         r.setCompanyId(1L);
+        PaymentRequest paymentRequest = new PaymentRequest();
+        paymentRequest.setPaymentMethod("CREDIT_CARD");
+        r.setPayment(paymentRequest);
         OrderItemRequest i = new OrderItemRequest();
         i.setProductId(10L);
         i.setQuantity(2.0);
@@ -95,13 +103,16 @@ public class OrderServiceTest {
         when(orderRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
 
         orderService.create(createBaseRequest());
-        verify(orderRepository).save(argThat(o -> o.getOrderAmount().compareTo(new BigDecimal("100.00")) == 0));
+
+        verify(orderRepository).save(argThat((Order o) ->
+                o.getOrderAmount() != null && o.getOrderAmount().compareTo(new BigDecimal("100.00")) == 0
+        ));
     }
 
     @Test
     @DisplayName("3. Módulo Order - Unitário: Taxa de Entrega")
     void create_DeliveryFee() {
-        Company company = new Company();
+        Company company = createBaseCompany();
         company.setDeliveryFee(new BigDecimal("15.00"));
 
         when(customerRepository.findById(any())).thenReturn(Optional.of(new Customer()));
@@ -114,7 +125,10 @@ public class OrderServiceTest {
         when(orderRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
 
         orderService.create(createBaseRequest());
-        verify(orderRepository).save(argThat(o -> o.getOrderFlee().compareTo(new BigDecimal("15.00")) == 0));
+
+        verify(orderRepository).save(argThat((Order o) ->
+                o.getOrderFlee() != null && o.getOrderFlee().compareTo(new BigDecimal("15.00")) == 0
+        ));
     }
 
     @Test

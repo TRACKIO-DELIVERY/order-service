@@ -14,10 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,9 +27,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@TestPropertySource(properties = {
+        "BUCKET_NAME=test-bucket",
+        "aws.region=us-east-1",
+        "aws.accessKey=fake",
+        "aws.secretKey=fake"
+})
 public class ProductServiceIntegrationTest {
-    @Autowired
-    private ProductServiceImp productService;
+
+    @Autowired private ProductServiceImp productService;
     @Autowired private ProductRepository productRepository;
     @Autowired private CompanyRepository companyRepository;
     @Autowired private CategoryRepository categoryRepository;
@@ -35,16 +43,18 @@ public class ProductServiceIntegrationTest {
     @Test
     @DisplayName("Deve persistir um produto real no banco de dados e recuperá-lo")
     void integration_CreateAndFindProduct() {
-        Company company = new Company();
-        company.setBussinessName("Empresa Teste");
-        company.setCnpj("12345678000199");
-        company.setEmail("teste@empresa.com");
-        company.setUsername("usuario.teste");
-        company.setPassword("123456");
-        company.setExpoPushToken("123456");
-        company.setPhone("84999343899");
+        Company company = Company.builder()
+                .bussinessName("Empresa Teste")
+                .cnpj("12345678000199")
+                .email("teste@empresa.com")
+                .username("usuario.teste")
+                .keycloakUserId(UUID.randomUUID())
+                .expoPushToken("123456")
+                .phone("84999343899")
+                .fullname("Empresa Teste LTDA")
+                .build();
 
-        companyRepository.save(company);
+        company = companyRepository.save(company);
 
         Category category = new Category();
         category.setName("Eletrônicos");
@@ -57,11 +67,11 @@ public class ProductServiceIntegrationTest {
         request.setCompanyId(company.getUserId());
         request.setCategoryId(category.getId());
 
-        ProductResponse saved = productService.create(request);
+        ProductResponse saved = productService.create(request, null);
 
         Optional<Product> found = productRepository.findById(saved.getId());
         assertTrue(found.isPresent());
         assertEquals("Mouse Gamer", found.get().getName());
+        assertEquals(0, new BigDecimal("150.00").compareTo(found.get().getPrice()));
     }
 }
-
