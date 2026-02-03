@@ -32,10 +32,7 @@ services:
     networks:
       - postgres_db
       - infra_api_gateway
-  redis:
-    image: redis:latest
-    ports:
-      - '6379'
+
 networks:
   postgres_db:
     driver: bridge
