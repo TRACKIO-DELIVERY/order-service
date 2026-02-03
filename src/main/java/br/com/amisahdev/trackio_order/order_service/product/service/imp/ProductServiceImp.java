@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -33,6 +34,13 @@ public class ProductServiceImp implements ProductService {
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        if (request.getPrice() == null || request.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Price Invalid");
+        }
+        if (request.getStock() == null || request.getStock() <= 0) {
+            throw new RuntimeException("Stock invalid");
+        }
 
 
         Product entity = productMapper.toEntity(request);
