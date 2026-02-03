@@ -18,19 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<CustomerResponse> create(
-            @Valid @RequestPart CustomerRequest request,
-            @RequestPart("image") MultipartFile image) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request,image));
+            @Valid @RequestBody CustomerRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request,null));
     }
 
-    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     public ResponseEntity<CustomerResponse> update(
             @PathVariable Long id,
-            @Valid @RequestPart CustomerRequest request,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id,request,image));
+            @Valid @RequestBody CustomerRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id,request,null));
     }
 
     @GetMapping("/{id}")
