@@ -1,0 +1,1 @@
+ALTER TABLE customer ALTER image_url DROP NOT NULL ;
