@@ -1,6 +1,6 @@
 package br.com.amisahdev.trackio_order.order_service.order.service.imp;
 
-import br.com.amisahdev.trackio_order.order_service.order.Repository.OrderRepository;
+import br.com.amisahdev.trackio_order.order_service.order.repository.OrderRepository;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.OrderCompletedCanceledRequest;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.OrderDeliveryRequest;
 import br.com.amisahdev.trackio_order.order_service.order.dto.request.OrderItemRequest;
@@ -10,6 +10,7 @@ import br.com.amisahdev.trackio_order.order_service.order.mapper.OrderMapper;
 import br.com.amisahdev.trackio_order.order_service.order.model.Order;
 import br.com.amisahdev.trackio_order.order_service.order.model.OrderItem;
 import br.com.amisahdev.trackio_order.order_service.order.model.OrderStatus;
+import br.com.amisahdev.trackio_order.order_service.order.model.Payment;
 import br.com.amisahdev.trackio_order.order_service.order.service.interf.OrderService;
 import br.com.amisahdev.trackio_order.order_service.product.model.Product;
 import br.com.amisahdev.trackio_order.order_service.product.repository.ProductRepository;
@@ -20,7 +21,6 @@ import br.com.amisahdev.trackio_order.order_service.user.repository.CompanyRepos
 import br.com.amisahdev.trackio_order.order_service.user.repository.CustomerRepository;
 import br.com.amisahdev.trackio_order.order_service.user.repository.DeliveryPersonRepository;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,10 +53,10 @@ public class OrderServiceImp implements OrderService {
         order.setOrderDate(LocalDateTime.now());
         order.setOrderStatus(OrderStatus.IN_PROGRESS);
 
-        if (company.getDeliveryFee().compareTo(BigDecimal.ZERO) > 0){
-            order.setOrderFlee(company.getDeliveryFee());
-        } else
-            order.setOrderFlee(BigDecimal.ZERO);
+        // Lógica da Taxa de Entrega (Ajustada para clareza)
+        BigDecimal deliveryFee = company.getDeliveryFee().compareTo(BigDecimal.ZERO) > 0
+                ? company.getDeliveryFee() : BigDecimal.ZERO;
+        order.setOrderFlee(deliveryFee);
 
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -69,17 +69,24 @@ public class OrderServiceImp implements OrderService {
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(itemReq.getQuantity());
-            item.setPrice(product.getPrice()); // Snapshot do preço atual
+            item.setPrice(product.getPrice());
 
             orderItems.add(item);
 
-            // Cálculo: totalAmount += price * quantity
             BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(itemReq.getQuantity()));
             totalAmount = totalAmount.add(itemTotal);
         }
 
         order.setItems(orderItems);
         order.setOrderAmount(totalAmount);
+
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setPaymentMethod(request.getPayment().getPaymentMethod());
+        payment.setAmount(totalAmount.add(deliveryFee));
+        payment.setPaymentDate(LocalDateTime.now());
+
+        order.setPayment(payment);
 
         return orderMapper.toResponse(orderRepository.save(order));
     }
@@ -93,12 +100,55 @@ public class OrderServiceImp implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponse> findAll() {
-        return null;
+        List<Order> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> findAllInRoute() {
+        List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.IN_ROUTE);
+
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> findAllInProgress() {
+        List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.IN_PROGRESS);
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> findAllInCancelled() {
+        List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.CANCELLED);
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> findAllInCompleted() {
+        List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.COMPLETED);
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
     }
 
     @Override
     public void deleteById(Long id) {
+        orderRepository.deleteById(id);
     }
 
     @Override

@@ -21,8 +21,6 @@ public class CustomerRequest extends UserRequest {
     @Past
     private LocalDate dateOfBirth;
 
-    private String imageUrl;
-
     @Valid
     @NotNull(message = "AddressId is required")
     private AddressRequest address;

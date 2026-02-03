@@ -12,6 +12,6 @@ import java.util.Date;
 public class CustomerResponse extends UserResponse{
     private String cpf;
     private Date dateOfBirth;
-    private String image_url;
+    private String imageUrl;
     private AddressResponse address;
 }

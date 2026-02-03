@@ -124,13 +124,13 @@ CREATE TABLE "user"
     created_at      TIMESTAMP WITHOUT TIME ZONE,
     created_user    VARCHAR(255) NOT NULL,
     updated_at      TIMESTAMP WITHOUT TIME ZONE,
-    updated_user    VARCHAR(255) NOT NULL,
+    updated_user    VARCHAR(255),
     username        VARCHAR(50)  NOT NULL,
-    password        VARCHAR(50)  NOT NULL,
     email           VARCHAR(50)  NOT NULL,
-    phone           VARCHAR(50)  NOT NULL,
+    phone           VARCHAR(50),
     role            VARCHAR(255),
-    expo_push_token VARCHAR(50)  NOT NULL,
+    expo_push_token VARCHAR(50),
+    keycloak_user_id UUID NOT NULL,
     CONSTRAINT pk_user PRIMARY KEY (user_id)
 );
 
