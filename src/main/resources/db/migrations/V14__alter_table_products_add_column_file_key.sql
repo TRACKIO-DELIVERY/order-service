@@ -1,0 +1,1 @@
+alter table product add column file_key varchar(255);

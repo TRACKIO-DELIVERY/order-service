@@ -6,15 +6,39 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
     ports:
-      - "5432:5432"
-  rabbitmq:
-    image: rabbitmq:latest
-    environment:
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - "5433:5432"
+    networks:
+      - postgres_db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  order-spring:
+    build: .
+    env_file:
+      - .env
     ports:
-      - '5672'
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - postgres_db
+      - infra_api_gateway
   redis:
     image: redis:latest
     ports:
       - '6379'
+networks:
+  postgres_db:
+    driver: bridge
+
+  infra_api_gateway:
+    external: true
