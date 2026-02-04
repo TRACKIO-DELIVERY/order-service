@@ -1,5 +1,9 @@
 package br.com.amisahdev.trackio_order.order_service.Unit.Category;
 
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.BusinessException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.CategoryAlreadyExistsException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.CategoryNotFoundException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserNotFoundException;
 import br.com.amisahdev.trackio_order.order_service.product.dto.request.CategoryRequest;
 import br.com.amisahdev.trackio_order.order_service.product.dto.response.CategoryResponse;
 import br.com.amisahdev.trackio_order.order_service.product.mapper.CategoryMapper;
@@ -66,7 +70,7 @@ public class CategoryServiceTest {
         when(companyRepository.findById(1L)).thenReturn(Optional.of(createMockCompany()));
         when(categoryRepository.existsByNameAndCompany_UserId("Limpeza", 1L)).thenReturn(true);
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> categoryService.create(request));
+        BusinessException ex = assertThrows(CategoryAlreadyExistsException.class, () -> categoryService.create(request));
         assertEquals("Category already exists", ex.getMessage());
 
         verifyNoInteractions(categoryMapper);
@@ -99,7 +103,8 @@ public class CategoryServiceTest {
     void delete_NotFound_ThrowsException() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> categoryService.delete(1L));
+        BusinessException ex = assertThrows(CategoryNotFoundException.class, () -> categoryService.delete(1L));
+        assertEquals("Category not found", ex.getMessage());
     }
 
     @Test
@@ -110,6 +115,7 @@ public class CategoryServiceTest {
 
         when(companyRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> categoryService.create(request));
+        BusinessException ex = assertThrows(UserNotFoundException.class, () -> categoryService.create(request));
+        assertEquals("Company not found", ex.getMessage());
     }
 }

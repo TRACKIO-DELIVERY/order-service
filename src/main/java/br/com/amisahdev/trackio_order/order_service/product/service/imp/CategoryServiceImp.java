@@ -1,5 +1,8 @@
 package br.com.amisahdev.trackio_order.order_service.product.service.imp;
 
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.CategoryAlreadyExistsException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.CategoryNotFoundException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserNotFoundException;
 import br.com.amisahdev.trackio_order.order_service.product.dto.request.CategoryRequest;
 import br.com.amisahdev.trackio_order.order_service.product.dto.response.CategoryResponse;
 import br.com.amisahdev.trackio_order.order_service.product.mapper.CategoryMapper;
@@ -26,12 +29,12 @@ public class CategoryServiceImp implements CategoryService {
     public CategoryResponse create(CategoryRequest request) {
 
         companyRepository.findById(request.getCompanyId())
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new UserNotFoundException("Company not found"));
 
         if (categoryRepository.existsByNameAndCompany_UserId(
                 request.getName(),
                 request.getCompanyId())) {
-            throw new RuntimeException("Category already exists");
+            throw new CategoryAlreadyExistsException();
         }
 
 
@@ -48,15 +51,14 @@ public class CategoryServiceImp implements CategoryService {
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = categoryRepository
                 .findByIdAndCompany_UserId(id, request.getCompanyId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Category not found or does not belong to company"));
+                .orElseThrow(CategoryNotFoundException::new);
 
         if (categoryRepository.existsByNameAndCompany_UserId(
                 request.getName(),
                 request.getCompanyId())
                 && !category.getName().equalsIgnoreCase(request.getName())) {
 
-            throw new RuntimeException("Category already exists");
+            throw new CategoryAlreadyExistsException();
         }
 
         category.setName(request.getName());
@@ -70,7 +72,7 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional
     public void delete(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(CategoryNotFoundException::new);
 
         categoryRepository.delete(category);
     }
