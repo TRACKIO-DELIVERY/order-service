@@ -1,5 +1,7 @@
 package br.com.amisahdev.trackio_order.order_service.user.service.imp;
 
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.BusinessException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserNotFoundException;
 import br.com.amisahdev.trackio_order.order_service.security.context.AuthenticatedUser;
 import br.com.amisahdev.trackio_order.order_service.security.context.UserContext;
 import br.com.amisahdev.trackio_order.order_service.services.AmazonS3Service;
@@ -46,7 +48,7 @@ public class CustomerServiceImp implements CustomerService {
         AuthenticatedUser authUser = userContext.auth();
 
         if (userService.findByKeycloakUserId(authUser.keycloakUserId()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new BusinessException("User already exists");
         }
 
         if(customerRepository.existsByCpf(request.getCpf())){
@@ -87,7 +89,7 @@ public class CustomerServiceImp implements CustomerService {
     @Transactional
     public CustomerResponse update(Long id, CustomerRequest request, MultipartFile newImage) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(()  -> new RuntimeException("Customer not found"));
+                .orElseThrow(()-> new UserNotFoundException("Customer not found"));
 
         String newFileKey = null;
         String oldFileKey = customer.getFileKey();
@@ -138,7 +140,7 @@ public class CustomerServiceImp implements CustomerService {
     @Transactional
     public void delete(Long id) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(()  -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new UserNotFoundException("Customer not found"));
 
         String fileKey = customer.getFileKey();
 
@@ -157,7 +159,7 @@ public class CustomerServiceImp implements CustomerService {
     @Transactional(readOnly = true)
     public CustomerResponse findById(Long id) {
         Customer entity = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(()-> new UserNotFoundException("Customer not found"));
         return customerMapper.toResponse(entity);
     }
 
@@ -165,7 +167,7 @@ public class CustomerServiceImp implements CustomerService {
     @Transactional(readOnly = true)
     public CustomerResponse findByCpf(String cpf) {
         Customer customer = customerRepository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(()-> new UserNotFoundException("Customer not found"));
         return customerMapper.toResponse(customer);
     }
 }

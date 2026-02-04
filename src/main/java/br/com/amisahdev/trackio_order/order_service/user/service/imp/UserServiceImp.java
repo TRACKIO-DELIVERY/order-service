@@ -33,7 +33,7 @@ public class UserServiceImp implements UserService {
     public UserResponse getMe(UUID keycloakUserId) {
 
         User user = repository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (user instanceof Company company) {
             return companyMapper.toResponse(company);

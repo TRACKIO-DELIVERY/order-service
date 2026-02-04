@@ -1,5 +1,7 @@
 package br.com.amisahdev.trackio_order.order_service.user.service.imp;
 
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.BusinessException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserNotFoundException;
 import br.com.amisahdev.trackio_order.order_service.security.context.AuthenticatedUser;
 import br.com.amisahdev.trackio_order.order_service.security.context.UserContext;
 import br.com.amisahdev.trackio_order.order_service.services.AmazonS3Service;
@@ -46,7 +48,7 @@ public class CompanyServiceImp implements CompanyService {
         AuthenticatedUser authUser = userContext.auth();
 
         if (userService.findByKeycloakUserId(authUser.keycloakUserId()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new BusinessException("User already exists");
         }
         if (companyRepository.existsByCnpj(request.getCnpj())){
             throw new RuntimeException("CNPJ already exists");
@@ -89,7 +91,7 @@ public class CompanyServiceImp implements CompanyService {
     @Transactional
     public CompanyResponse update(Long id, CompanyRequest request, MultipartFile newImage) {
         Company entity = companyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new UserNotFoundException("Company not found"));
 
         String newFileKey = null;
         String oldFileKey = entity.getFileKey();
@@ -140,7 +142,7 @@ public class CompanyServiceImp implements CompanyService {
     @Transactional
     public void delete(Long id) {
         Company company = companyRepository.findById(id)
-                .orElseThrow(()  -> new RuntimeException("Company not found"));
+                .orElseThrow(()  -> new UserNotFoundException("Company not found"));
 
         String fileKey = company.getFileKey();
         companyRepository.deleteById(id);
@@ -162,7 +164,7 @@ public class CompanyServiceImp implements CompanyService {
     public CompanyResponse findById(Long id) {
 
         Company entity = companyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new UserNotFoundException("Company not found"));
 
         return companyMapper.toResponse(entity);
     }
@@ -171,7 +173,7 @@ public class CompanyServiceImp implements CompanyService {
     @Transactional(readOnly = true)
     public CompanyResponse findByCnpj(String cnpj) {
         Company entity = companyRepository.findByCnpj(cnpj)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new UserNotFoundException("Company not found"));
         return companyMapper.toResponse(entity);
     }
 
