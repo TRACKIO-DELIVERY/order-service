@@ -1,6 +1,7 @@
 package br.com.amisahdev.trackio_order.order_service.user.service.imp;
 
-import br.com.amisahdev.trackio_order.order_service.geral.exceptions.BusinessException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.CnpjAlreadyExistsException;
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserAlreadyExistsException;
 import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserNotFoundException;
 import br.com.amisahdev.trackio_order.order_service.security.context.AuthenticatedUser;
 import br.com.amisahdev.trackio_order.order_service.security.context.UserContext;
@@ -15,6 +16,7 @@ import br.com.amisahdev.trackio_order.order_service.user.models.Role;
 import br.com.amisahdev.trackio_order.order_service.user.repository.CompanyRepository;
 import br.com.amisahdev.trackio_order.order_service.user.service.interf.CompanyService;
 import br.com.amisahdev.trackio_order.order_service.user.service.interf.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CompanyServiceImp implements CompanyService {
@@ -48,10 +51,12 @@ public class CompanyServiceImp implements CompanyService {
         AuthenticatedUser authUser = userContext.auth();
 
         if (userService.findByKeycloakUserId(authUser.keycloakUserId()).isPresent()) {
-            throw new BusinessException("User already exists");
+            log.info("User with id {} already exists", authUser.keycloakUserId());
+            throw new UserAlreadyExistsException();
         }
         if (companyRepository.existsByCnpj(request.getCnpj())){
-            throw new RuntimeException("CNPJ already exists");
+            log.info("User with CNPJ {} already exists", request.getCnpj());
+            throw new CnpjAlreadyExistsException();
         }
 
         Company toEntity = companyMapper.toEntity(request);
@@ -72,6 +77,7 @@ public class CompanyServiceImp implements CompanyService {
 
                 toEntity.setImageUrl(fullUrl);
             } catch (IOException e) {
+                log.error("Error uploading file", e);
                 throw new RuntimeException("Failed to upload image to S3", e);
             }
         }
@@ -107,6 +113,7 @@ public class CompanyServiceImp implements CompanyService {
                 entity.setImageUrl(fullUrl);
 
             } catch (IOException e) {
+                log.error("Error uploading file", e);
                 throw new RuntimeException("Failed to update image", e);
             }
         }
@@ -134,6 +141,7 @@ public class CompanyServiceImp implements CompanyService {
             if (newFileKey != null){
                 amazonS3Service.deleteFile(newFileKey);
             }
+            log.error("Error uploading file", e);
             throw e;
         }
     }
@@ -151,6 +159,7 @@ public class CompanyServiceImp implements CompanyService {
             try {
                 amazonS3Service.deleteFile(fileKey);
             } catch (Exception e) {
+                log.error("Error uploading file", e);
                 System.err.println("Error deleting file in S3: " + e.getMessage());
             }
 
