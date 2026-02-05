@@ -1,0 +1,50 @@
+name: PR - Tests and Coverage
+
+on:
+  pull_request:
+    branches: ["develop"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Coretto) + Maven Cache
+        timeout-minutes: 30
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: maven
+
+      - name: Build and Test
+        if: always()
+        run: mvn -B -ntp clean verify
+
+      - name: Upload test & coverage reports
+        uses: 'actions/upload-artifact@v4'
+        with:
+          name: jacoco-report
+          path: |
+            ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+            ${{ github.workspace }}/target/site/jacoco/index.html
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80
+          min-coverage-changed-files: 60
+          title: '# :recycle: Coverage Report'
+          update-comment: true
+          pass-emoji: ':green_circle:'
+          fail-emoji: ':red_circle:'
