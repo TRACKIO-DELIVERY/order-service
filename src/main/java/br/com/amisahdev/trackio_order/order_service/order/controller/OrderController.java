@@ -70,4 +70,9 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.findAllInCompleted());
     }
 
+    @GetMapping("/company/{id}")
+    public ResponseEntity<List<OrderResponse>> findByCompany(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findByCompanyId(id));
+    }
+
 }

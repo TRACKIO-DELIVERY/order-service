@@ -11,6 +11,7 @@ import java.util.List;
 public interface OrderService {
     OrderResponse create (OrderRequest request);
     OrderResponse findById(Long id);
+    List<OrderResponse> findByCompanyId(Long companyId);
     List<OrderResponse> findAll();
     List<OrderResponse> findAllInRoute();
     List<OrderResponse> findAllInProgress();

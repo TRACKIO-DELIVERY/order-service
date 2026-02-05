@@ -111,6 +111,17 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<OrderResponse> findByCompanyId(Long companyId) {
+        List<Order> orders = orderRepository.findByCompany_UserId(companyId);
+
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
     public List<OrderResponse> findAllInRoute() {
         List<Order> orders = orderRepository.findByOrderStatus(OrderStatus.IN_ROUTE);
 
