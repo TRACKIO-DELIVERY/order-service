@@ -1,5 +1,6 @@
 package br.com.amisahdev.trackio_order.order_service.geral.handlers;
 
+import br.com.amisahdev.trackio_order.order_service.geral.exceptions.RestrictionViolationException;
 import br.com.amisahdev.trackio_order.order_service.geral.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(final UserNotFoundException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RestrictionViolationException.class)
+    public ResponseEntity<Object> handleRestrictionViolationException(final RestrictionViolationException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> handleRuntimeException(final RuntimeException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

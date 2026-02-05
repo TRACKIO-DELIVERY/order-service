@@ -24,13 +24,12 @@ public class CompanyController {
 
     private final CompanyService companyService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<CompanyResponse> create(
             @Validated(NotRequiresExpoToken.class)
-            @Valid @RequestPart CompanyRequest request,
-            @RequestPart(value = "image", required = false)MultipartFile image) {
+            @Valid @RequestBody CompanyRequest request) {
 
-        CompanyResponse companyResponse = companyService.create(request,image);
+        CompanyResponse companyResponse = companyService.create(request,null);
         return ResponseEntity.status(HttpStatus.CREATED).body(companyResponse);
     }
 
@@ -39,12 +38,11 @@ public class CompanyController {
         return ResponseEntity.status(HttpStatus.OK).body(companyService.findById(id));
     }
 
-    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     public ResponseEntity<CompanyResponse> update(
             @PathVariable Long id,
-            @Valid @RequestPart CompanyRequest request,
-            @RequestPart("image") MultipartFile image) {
-        return ResponseEntity.status(HttpStatus.OK).body(companyService.update(id, request,image));
+            @Valid @RequestBody CompanyRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(companyService.update(id, request,null));
     }
 
     @DeleteMapping("/{id}")
