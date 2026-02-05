@@ -1,22 +1,24 @@
-name: Measure code coverage
+name: PR - Tests and Coverage
 
 on:
   pull_request:
+    branches: ["develop"]
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  build:
+  verify:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 21 (Coretto) + Maven Cache
         timeout-minutes: 30
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'corretto'
@@ -24,10 +26,9 @@ jobs:
 
       - name: Build and Test
         if: always()
-        run: mvn clean verify
-        continue-on-error: true
+        run: mvn -B -ntp clean verify
 
-      - name: Upload Report
+      - name: Upload test & coverage reports
         uses: 'actions/upload-artifact@v4'
         with:
           name: jacoco-report
