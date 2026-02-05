@@ -25,7 +25,6 @@ jobs:
           cache: maven
 
       - name: Build and Test
-        if: always()
         run: mvn -B -ntp clean verify
 
   sync_notify_trackio:
@@ -33,7 +32,7 @@ jobs:
     needs: build
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Sync and notify Track.io
         env:
@@ -48,6 +47,7 @@ jobs:
             -d "{
               \"event_type\": \"order-service-updated\",
               \"client_payload\": {
+                \"service\": \"order-service\",
                 \"ref\": \"${{ github.ref }}\",
                 \"sha\": \"${{ github.sha }}\",
                 \"repo\": \"${{ github.repository }}\"
