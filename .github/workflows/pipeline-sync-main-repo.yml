@@ -24,6 +24,10 @@ jobs:
           distribution: 'corretto'
           cache: maven
 
+      - name: Build and Test
+        if: always()
+        run: mvn -B -ntp clean verify
+
   sync_notify_trackio:
     runs-on: ubuntu-latest
     needs: build
