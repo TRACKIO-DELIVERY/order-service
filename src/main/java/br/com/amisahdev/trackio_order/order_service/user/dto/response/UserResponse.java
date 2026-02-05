@@ -14,4 +14,5 @@ public abstract class UserResponse {
     private String phone;
     private Role role;
     private String expoPushToken;
+    private String fullname;
 }
