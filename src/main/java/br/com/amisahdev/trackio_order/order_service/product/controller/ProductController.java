@@ -32,7 +32,7 @@ public class ProductController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> update(
             @PathVariable Long id,
-            @Valid @RequestPart("request") ProductRequest request,
+            @Valid @RequestPart("product") ProductRequest request,
             @RequestPart(value = "image", required = false) MultipartFile image) {
 
         return ResponseEntity.status(HttpStatus.OK)
